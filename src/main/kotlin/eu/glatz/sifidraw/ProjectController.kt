@@ -18,4 +18,9 @@ class ProjectController @Autowired constructor(private val projectService: Proje
     fun getProjectData(): List<ProjectData> {
         return projectService.getProjectData();
     }
+
+
+    fun getProjectDetails(@RequestParam(defaultValue = "") id: String) {
+
+    }
 }
