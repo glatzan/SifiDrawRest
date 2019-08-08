@@ -1,2 +1,8 @@
 settings:
   baseDir: D:\Projekte\sididraw
+
+database:
+  dir: D:\Projekte\sididraw
+  port: 27017
+  host: localhost
+

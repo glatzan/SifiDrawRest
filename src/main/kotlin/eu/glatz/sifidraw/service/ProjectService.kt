@@ -15,18 +15,18 @@ class ProjectService : AbstractService() {
 
     lateinit var baseDir: String
 
-    public fun getProjectData(): List<ProjectData> {
-        val file = File(baseDir)
-        val directories = file.list { current, name -> File(current, name).isDirectory }
-        val projects = directories.mapIndexedNotNull { index, dir -> ProjectData(index.toLong(), dir) }
-
-        projects.forEach {
-            val f = File(baseDir, it.name)
-            print(f.absolutePath )
-            val subProjects = f.list { current, name -> File(current, name).isDirectory }.mapIndexedNotNull { index, dir -> SubProject(index.toLong(), dir) }
-            it.subProjects = subProjects;
-        }
-
-        return projects
-    }
+//    public fun getProjectData(): List<ProjectData> {
+//        val file = F ile(baseDir)
+//        val directories = file.list { current, name -> File(current, name).isDirectory }
+//        val projects = directories.mapIndexedNotNull { index, dir -> ProjectData(index.toLong(), dir) }
+//
+//        projects.forEach {
+//            val f = File(baseDir, it.name)
+//            print(f.absolutePath )
+//            val subProjects = f.list { current, name -> File(current, name).isDirectory }.mapIndexedNotNull { index, dir -> SubProject(index.toLong(), dir) }
+//            it.subProjects = subProjects;
+//        }
+//
+//        return projects
+//    }
 }
