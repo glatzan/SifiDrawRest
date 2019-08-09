@@ -1,13 +1,11 @@
 package eu.glatz.sifidraw.model
 
 class ProjectData{
-    var id: Long
-    var name: String
-    var subProjects : List<SubProject>
+    var id: String
+    var datasets : List<Dataset>
 
-    constructor(id : Long, name : String){
+    constructor(id : String){
         this.id = id
-        this.name = name
-        this.subProjects = listOf()
+        this.datasets = listOf()
     }
 }

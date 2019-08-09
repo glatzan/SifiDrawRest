@@ -4,7 +4,6 @@ import javax.annotation.PreDestroy
 import de.flapdoodle.embed.mongo.MongodStarter
 import de.flapdoodle.embed.process.extract.UserTempNaming
 import de.flapdoodle.embed.mongo.Command
-import javax.xml.catalog.CatalogFeatures.defaults
 import de.flapdoodle.embed.process.config.IRuntimeConfig
 import java.io.IOException
 import javax.annotation.PostConstruct

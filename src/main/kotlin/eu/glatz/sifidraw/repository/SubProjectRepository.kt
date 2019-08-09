@@ -1,8 +1,8 @@
 package eu.glatz.sifidraw.repository
 
-import eu.glatz.sifidraw.model.SubProject
+import eu.glatz.sifidraw.model.Dataset
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface SubProjectRepository : MongoRepository<SubProject, String> {
-    fun findByName(name: String): List<SubProject>
+interface SubProjectRepository : MongoRepository<Dataset, String> {
+    fun findByName(name: String): List<Dataset>
 }

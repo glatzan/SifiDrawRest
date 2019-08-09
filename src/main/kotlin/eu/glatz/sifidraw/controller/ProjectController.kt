@@ -1,4 +1,4 @@
-package eu.glatz.sifidraw
+package eu.glatz.sifidraw.controller
 
 import eu.glatz.sifidraw.model.ProjectData
 import eu.glatz.sifidraw.service.ProjectService
