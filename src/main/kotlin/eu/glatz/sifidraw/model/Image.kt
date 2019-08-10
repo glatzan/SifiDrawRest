@@ -3,9 +3,10 @@ package eu.glatz.sifidraw.model
 class Image {
 
     var name: String
-    var data = byteArrayOf()
+    var data : String
 
-    constructor(name: String) {
+    constructor(name: String, data : String) {
         this.name = name
+        this.data = data
     }
 }
