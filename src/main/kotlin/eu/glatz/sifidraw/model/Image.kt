@@ -2,11 +2,13 @@ package eu.glatz.sifidraw.model
 
 class Image {
 
-    var name: String
+    var id: String
     var data : String
+    var layers : MutableList<Layer>
 
-    constructor(name: String, data : String) {
-        this.name = name
-        this.data = data
+    constructor(id: String) {
+        this.id = id
+        this.data = ""
+        layers = mutableListOf()
     }
 }

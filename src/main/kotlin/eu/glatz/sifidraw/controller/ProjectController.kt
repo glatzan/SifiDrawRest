@@ -13,14 +13,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class ProjectController @Autowired constructor(private val projectService: ProjectService) {
 
-    @CrossOrigin
     @RequestMapping("/projects")
     fun getProjectData(): List<ProjectData> {
         return projectService.getProjectData();
-    }
-
-
-    fun getProjectDetails(@RequestParam(defaultValue = "") id: String) {
-
     }
 }
