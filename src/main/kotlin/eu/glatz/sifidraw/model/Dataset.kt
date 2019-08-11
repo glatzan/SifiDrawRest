@@ -6,9 +6,11 @@ import org.springframework.data.annotation.Id
 class Dataset {
 
     var id: String
+    var name : String
     var images = mutableListOf<Image>()
 
-    constructor(id: String) {
+    constructor(id: String, name: String) {
         this.id = id
+        this.name = name
     }
 }

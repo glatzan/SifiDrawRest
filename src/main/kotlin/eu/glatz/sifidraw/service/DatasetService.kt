@@ -18,8 +18,8 @@ class DatasetService @Autowired constructor(
         if ("" == id)
             throw IllegalArgumentException("");
 
-        val dataset = Dataset(id)
-        val base = File(projectSettings.dir, id.replace("_","/"))
+        val dataset = Dataset(id, id.substringAfterLast("_|_"))
+        val base = File(projectSettings.dir, id.replace("_|_","/"))
 
         if(!base.isDirectory)
             throw IllegalArgumentException("");
@@ -34,7 +34,7 @@ class DatasetService @Autowired constructor(
             //        val os = ByteArrayOutputStream()
             //        ImageIO.write(imageBuff, img.substringAfterLast("."), os)
             //        val encodeImage = Base64.getEncoder().withoutPadding().encodeToString(os.toByteArray())
-            var img = Image(img);
+            var img = Image("${id}_|_$img", img);
             dataset.images.add(img)
         }
         return dataset
