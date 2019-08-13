@@ -8,14 +8,8 @@ import eu.glatz.sifidraw.repository.ImageRepository
 import eu.glatz.sifidraw.service.ProjectService
 import eu.glatz.sifidraw.util.ImageReader
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.PathVariable
 import java.io.File
 
 
@@ -25,20 +19,20 @@ class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
         private val projectSettings: ProjectSettings) {
 
-    @RequestMapping("/image/{id}")
+    @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
-        val img =  imageRepository.findById(id).orElse(Image(id,id.substringAfterLast("_|_")))
-        img.data = ImageReader.readImgAsBase64(File(projectSettings.dir, id.replace("_|_","/")))
+        val img = imageRepository.findById(id).orElse(Image(id, id.substringAfterLast("_|_")))
+        img.data = ImageReader.readImgAsBase64(File(projectSettings.dir, id.replace("_|_", "/")))
         return img
     }
 
-    @RequestMapping(value = "/image/{id}", method = [RequestMethod.PUT])
-    fun modifyImageData(@PathVariable("id") id: String, @Valid @RequestBody image: Image) {
-        image.id = id;
-        imageRepository.save(image)
+    @PutMapping(value = "/image")
+    fun modifyImageData(@RequestBody image: Image): Image {
+        println("put")
+        return imageRepository.save(image)
     }
 
-    @RequestMapping(value = "/image/{id}", method = [RequestMethod.DELETE])
+    @DeleteMapping(value = "/image/{id}")
     fun deleteImageData(@PathVariable id: String) {
 
         val obj = imageRepository.findById(id);
