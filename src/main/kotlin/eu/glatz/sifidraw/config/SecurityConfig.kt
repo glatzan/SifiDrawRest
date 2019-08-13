@@ -29,10 +29,23 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         try {
             // setup security
             http.authorizeRequests().antMatchers("/*").permitAll()
+            http.cors().and().csrf().disable();
         } catch (ex: Exception) {
             throw RuntimeException(ex)
         }
 
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = Arrays.asList("*")
+        configuration.allowedMethods = Arrays.asList("*")
+        configuration.allowedHeaders = Arrays.asList("*")
+        configuration.allowCredentials = true
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 
 }

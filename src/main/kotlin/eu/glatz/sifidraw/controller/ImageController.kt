@@ -29,6 +29,7 @@ class ImageController @Autowired constructor(
     @PutMapping(value = "/image")
     fun modifyImageData(@RequestBody image: Image): Image {
         println("put")
+        image.data = ""
         return imageRepository.save(image)
     }
 
@@ -40,4 +41,5 @@ class ImageController @Autowired constructor(
             return
         imageRepository.delete(obj.get())
     }
+
 }
