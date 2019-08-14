@@ -7,6 +7,7 @@ import eu.glatz.sifidraw.service.ProjectService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.io.File
 
 @CrossOrigin
 @RestController
@@ -17,4 +18,11 @@ class DatasetController @Autowired constructor(private val datasetService: Datas
         println("hallo $id"        )
         return datasetService.getDataset(id);
     }
+
+    @GetMapping("/dataset/new/{id}")
+    fun createDataset(@PathVariable id: String): Boolean{
+        println("creating dir $id")
+        return File(id.replace("/","_|_")).mkdir();
+    }
+
 }

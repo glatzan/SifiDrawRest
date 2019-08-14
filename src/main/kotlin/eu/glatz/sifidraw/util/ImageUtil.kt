@@ -4,8 +4,11 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
+import java.io.ByteArrayInputStream
+import java.awt.image.BufferedImage
 
-class ImageReader {
+
+class ImageUtil {
 
     companion object {
 
@@ -19,6 +22,19 @@ class ImageReader {
                 return Base64.getEncoder().withoutPadding().encodeToString(os.toByteArray())
             }
             return ""
+        }
+
+        @JvmStatic
+        fun writeBase64Img(imageString: String, file: File) {
+            try {
+                val decoder = Base64.getDecoder().decode(imageString)
+                val bis = ByteArrayInputStream(decoder)
+                val image = ImageIO.read(bis)
+                bis.close()
+                ImageIO.write(image, "png", file)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

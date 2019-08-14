@@ -1,15 +1,11 @@
 package eu.glatz.sifidraw.controller
 
 import eu.glatz.sifidraw.config.ProjectSettings
-import eu.glatz.sifidraw.model.Dataset
 import eu.glatz.sifidraw.model.Image
-import eu.glatz.sifidraw.model.ProjectData
 import eu.glatz.sifidraw.repository.ImageRepository
-import eu.glatz.sifidraw.service.ProjectService
-import eu.glatz.sifidraw.util.ImageReader
+import eu.glatz.sifidraw.util.ImageUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 import java.io.File
 
 
@@ -22,7 +18,7 @@ class ImageController @Autowired constructor(
     @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
         val img = imageRepository.findById(id).orElse(Image(id, id.substringAfterLast("_|_")))
-        img.data = ImageReader.readImgAsBase64(File(projectSettings.dir, id.replace("_|_", "/")))
+        img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, id.replace("_|_", "/")))
         return img
     }
 
@@ -42,4 +38,8 @@ class ImageController @Autowired constructor(
         imageRepository.delete(obj.get())
     }
 
+    @PostMapping("/image/new/{id}")
+    fun addImage(@PathVariable id: String, @RequestBody image: Image) {
+        ImageUtil.writeBase64Img(image.data, File(id));
+    }
 }
