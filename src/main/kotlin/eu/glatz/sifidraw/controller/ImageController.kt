@@ -29,6 +29,16 @@ class ImageController @Autowired constructor(
         return imageRepository.save(image)
     }
 
+    @PostMapping(value = "/image")
+    fun createImageData(@RequestBody image: Image) {
+        println("put")
+        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, image.id.replace("_|_", "/")))
+        if (image.layers != null && image.layers.isEmpty()) {
+            imageRepository.save(image)
+        }
+    }
+
+
     @DeleteMapping(value = "/image/{id}")
     fun deleteImageData(@PathVariable id: String) {
 

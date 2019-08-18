@@ -1,5 +1,6 @@
 package eu.glatz.sifidraw.controller
 
+import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Dataset
 import eu.glatz.sifidraw.model.ProjectData
 import eu.glatz.sifidraw.service.DatasetService
@@ -11,18 +12,21 @@ import java.io.File
 
 @CrossOrigin
 @RestController
-class DatasetController @Autowired constructor(private val datasetService: DatasetService) {
+class DatasetController @Autowired constructor(
+        private val datasetService: DatasetService,
+        private val projectSettings: ProjectSettings) {
 
     @GetMapping("/dataset/{id}")
     fun getDataset(@PathVariable id: String): Dataset {
-        println("hallo $id"        )
+        println("hallo $id")
         return datasetService.getDataset(id);
     }
 
-    @GetMapping("/dataset/new/{id}")
-    fun createDataset(@PathVariable id: String): Boolean{
-        println("creating dir $id")
-        return File(id.replace("/","_|_")).mkdir();
+    @PostMapping("/dataset/new/{id}")
+    fun createDataset(@PathVariable id: String): Boolean {
+        val f = File(projectSettings.dir, id.replace("_|_", "/"))
+        println("creating dir ${f.absolutePath}")
+        return f.mkdir();
     }
 
 }
