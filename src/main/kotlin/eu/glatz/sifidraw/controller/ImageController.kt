@@ -21,7 +21,7 @@ class ImageController @Autowired constructor(
     fun getImageData(@PathVariable id: String): Image {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
 
-        val img = imageRepository.findById(id).orElse(Image(id, id.substringAfterLast("/")))
+        val img = imageRepository.findById(id).orElse(Image(id, decodedID.substringAfterLast("/")))
         img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, decodedID))
         return img
     }

@@ -19,10 +19,10 @@ class DatasetService @Autowired constructor(
     public fun getDataset(id: String): Dataset {
         if ("" == id)
             throw IllegalArgumentException("");
-println(id)
+
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
 
-        val dataset = Dataset(id, id.substringAfterLast("/"))
+        val dataset = Dataset(id, decodedID.substringAfterLast("/"))
         val base = File(projectSettings.dir, decodedID)
 
         if (!base.isDirectory)
