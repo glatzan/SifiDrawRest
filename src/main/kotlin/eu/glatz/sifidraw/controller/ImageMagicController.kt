@@ -16,7 +16,6 @@ class ImageMagicController @Autowired constructor(
     fun modifyImageData(@RequestBody image: Image, @PathVariable command: String): Image {
         println("put " + command)
         val command = String(Base64.getDecoder().decode(command), Charset.forName("UTF-8"))
-        println(command)
 
         val file = imageMagicService.prepareImage(image)
         val resultFile = imageMagicService.runImageMagic(file, command);
@@ -24,7 +23,7 @@ class ImageMagicController @Autowired constructor(
 
         return if (result != "") {
             image.data = result;
-            image.id = Base64.getEncoder().encodeToString(resultFile.name.toString().toByteArray())
+            image.id = Base64.getEncoder().withoutPadding().encodeToString(resultFile.name.toString().toByteArray())
             image;
         } else {
             Image("error", "")

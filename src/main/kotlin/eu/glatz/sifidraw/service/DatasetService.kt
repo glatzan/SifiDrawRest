@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestParam
 import java.io.File
 import java.lang.IllegalArgumentException
+import java.nio.charset.Charset
+import java.util.*
 
 @Service
 class DatasetService @Autowired constructor(
@@ -17,11 +19,13 @@ class DatasetService @Autowired constructor(
     public fun getDataset(id: String): Dataset {
         if ("" == id)
             throw IllegalArgumentException("");
+println(id)
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
 
-        val dataset = Dataset(id, id.substringAfterLast("_|_"))
-        val base = File(projectSettings.dir, id.replace("_|_","/"))
+        val dataset = Dataset(id, id.substringAfterLast("/"))
+        val base = File(projectSettings.dir, decodedID)
 
-        if(!base.isDirectory)
+        if (!base.isDirectory)
             throw IllegalArgumentException("");
 
         var imgs = base.list { current, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) }
@@ -34,7 +38,7 @@ class DatasetService @Autowired constructor(
             //        val os = ByteArrayOutputStream()
             //        ImageIO.write(imageBuff, img.substringAfterLast("."), os)
             //        val encodeImage = Base64.getEncoder().withoutPadding().encodeToString(os.toByteArray())
-            var img = Image("${id}_|_$img", img);
+            var img = Image(Base64.getEncoder().withoutPadding().encodeToString("${decodedID}/$img".toByteArray()), img);
             dataset.images.add(img)
         }
         return dataset

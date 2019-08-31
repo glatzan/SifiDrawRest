@@ -6,10 +6,10 @@ database:
   host: localhost
 
 imagemagic:
-  dir: D:\Projekte\sididraw\imagemagic
-  executable: convert.exe
+  dir: R:\
+  executable: R:\convert.exe
   file: out{}.png
-  command: "{dir}/{executable} {command} {inputfile} {outputfile}"
+  command: "{executable} {command} {inputfile} {outputfile}"
 
 spring:
   servlet:

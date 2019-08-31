@@ -7,6 +7,8 @@ import eu.glatz.sifidraw.util.ImageUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.io.File
+import java.nio.charset.Charset
+import java.util.*
 
 
 @CrossOrigin
@@ -17,8 +19,10 @@ class ImageController @Autowired constructor(
 
     @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
-        val img = imageRepository.findById(id).orElse(Image(id, id.substringAfterLast("_|_")))
-        img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, id.replace("_|_", "/")))
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+
+        val img = imageRepository.findById(id).orElse(Image(id, id.substringAfterLast("/")))
+        img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, decodedID))
         return img
     }
 
@@ -32,7 +36,7 @@ class ImageController @Autowired constructor(
     @PostMapping(value = "/image")
     fun createImageData(@RequestBody image: Image) {
         println("put")
-        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, image.id.replace("_|_", "/")))
+        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, image.id))
         if (image.layers != null && image.layers.isEmpty()) {
             imageRepository.save(image)
         }
@@ -42,7 +46,9 @@ class ImageController @Autowired constructor(
     @DeleteMapping(value = "/image/{id}")
     fun deleteImageData(@PathVariable id: String) {
 
-        val obj = imageRepository.findById(id);
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+
+        val obj = imageRepository.findById(decodedID);
         if (!obj.isPresent)
             return
         imageRepository.delete(obj.get())
@@ -50,6 +56,7 @@ class ImageController @Autowired constructor(
 
     @PostMapping("/image/new/{id}")
     fun addImage(@PathVariable id: String, @RequestBody image: Image) {
-        ImageUtil.writeBase64Img(image.data, File(id));
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+        ImageUtil.writeBase64Img(image.data, File(decodedID));
     }
 }
