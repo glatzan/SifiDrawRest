@@ -7,7 +7,7 @@ database:
 
 imagemagic:
   dir: R:\
-  executable: R:\convert.exe
+  executable: D:\Projekte\sididraw\imagemagic\convert.exe
   file: out{}.png
   command: "{executable} {command} {inputfile} {outputfile}"
 

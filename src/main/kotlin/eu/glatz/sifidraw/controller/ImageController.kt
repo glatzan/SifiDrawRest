@@ -15,7 +15,7 @@ import java.util.*
 @RestController
 class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
-        private val projectSettings: ProjectSettings) {
+        private val projectSettings: ProjectSettings)  {
 
     @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
