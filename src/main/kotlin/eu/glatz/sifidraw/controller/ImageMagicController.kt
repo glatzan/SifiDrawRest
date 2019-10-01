@@ -23,7 +23,7 @@ class ImageMagicController @Autowired constructor(
 
         return if (result != "") {
             image.data = result;
-            image.id = Base64.getEncoder().withoutPadding().encodeToString(resultFile.name.toString().toByteArray())
+            image.id = Base64.getEncoder().encodeToString(resultFile.name.toString().toByteArray())
             image;
         } else {
             Image("error", "")

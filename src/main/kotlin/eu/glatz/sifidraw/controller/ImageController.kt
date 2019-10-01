@@ -15,14 +15,13 @@ import java.util.*
 @RestController
 class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
-        private val projectSettings: ProjectSettings)  {
+        private val projectSettings: ProjectSettings) {
 
     @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-
         val img = imageRepository.findById(id).orElse(Image(id, decodedID.substringAfterLast("/")))
-        img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, decodedID))
+        img.data = ImageUtil.readImgAsBase64(ImageUtil.findImage(projectSettings.dir, decodedID))
         return img
     }
 
@@ -33,10 +32,14 @@ class ImageController @Autowired constructor(
         return imageRepository.save(image)
     }
 
-    @PostMapping(value = "/image")
-    fun createImageData(@RequestBody image: Image) {
-        println("put")
-        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, image.id))
+    @PostMapping(value = "/image/{type}")
+    fun createImageData(@RequestBody image: Image, @PathVariable type: String) {
+
+        if (!type.matches(Regex("jpg|png|tif")))
+            return;
+
+        println("post + type " + type)
+        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, image.id + ".type"))
         if (image.layers != null && image.layers.isEmpty()) {
             imageRepository.save(image)
         }
@@ -52,11 +55,5 @@ class ImageController @Autowired constructor(
         if (!obj.isPresent)
             return
         imageRepository.delete(obj.get())
-    }
-
-    @PostMapping("/image/new/{id}")
-    fun addImage(@PathVariable id: String, @RequestBody image: Image) {
-        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        ImageUtil.writeBase64Img(image.data, File(decodedID));
     }
 }

@@ -6,6 +6,7 @@ import java.util.*
 import javax.imageio.ImageIO
 import java.io.ByteArrayInputStream
 import java.awt.image.BufferedImage
+import java.io.FileNotFoundException
 
 
 class ImageUtil {
@@ -19,7 +20,7 @@ class ImageUtil {
                 val img = ImageIO.read(file)
                 val os = ByteArrayOutputStream()
                 ImageIO.write(img, "png", os)
-                return Base64.getEncoder().withoutPadding().encodeToString(os.toByteArray())
+                return Base64.getEncoder().encodeToString(os.toByteArray())
             }
             return ""
         }
@@ -35,6 +36,18 @@ class ImageUtil {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+
+        @JvmStatic
+        fun findImage(path: String, imagePrefix : String) : File{
+
+            val base = File(path, imagePrefix.substringBeforeLast("/"))
+            val img = base.listFiles{ current, name -> name.matches(Regex(imagePrefix.substringAfterLast("/")+".*")) }
+
+            if(img.size >= 0)
+                return img[0];
+
+            throw FileNotFoundException();
         }
     }
 }

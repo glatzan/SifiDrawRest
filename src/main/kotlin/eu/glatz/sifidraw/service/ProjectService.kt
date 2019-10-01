@@ -30,7 +30,7 @@ class ProjectService @Autowired constructor(
 
         projects.forEach {
             val project = File(base, it.id)
-            it.datasets = project.list { current, name -> File(current, name).isDirectory && !name.startsWith(".")}.map { dir -> Dataset(Base64.getEncoder().withoutPadding().encodeToString("${it.id}/$dir".toByteArray()), dir) }
+            it.datasets = project.list { current, name -> File(current, name).isDirectory && !name.startsWith(".")}.map { dir -> Dataset(Base64.getEncoder().encodeToString("${it.id}/$dir".toByteArray()), dir) }
         }
 
         return projects

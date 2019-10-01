@@ -11,6 +11,9 @@ import java.io.File
 import java.lang.IllegalArgumentException
 import java.nio.charset.Charset
 import java.util.*
+import java.util.Collections
+
+
 
 @Service
 class DatasetService @Autowired constructor(
@@ -30,7 +33,21 @@ class DatasetService @Autowired constructor(
 
         var imgs = base.list { current, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) }
 
-        for (img in imgs) {
+        var list = imgs.toList();
+        Collections.sort(list, object : Comparator<String> {
+             override fun compare(o1: String, o2: String): Int {
+                return extractInt(o1) - extractInt(o2)
+            }
+
+            internal fun extractInt(s: String): Int {
+                val num = s.replace("\\D".toRegex(), "")
+                // return 0 if no digits found
+                return if (num.isEmpty()) 0 else Integer.parseInt(num)
+            }
+        })
+
+        for (img in list) {
+            val imgWithoudFileEnd = img.substringBeforeLast(".")
             //         val imgFile = File(dataset, img)
             //        val thumb = ImageIO.read(imgFile).getScaledInstance(100, 100, BufferedImage.SCALE_SMOOTH)
             //        val imageBuff = BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB)
@@ -38,8 +55,8 @@ class DatasetService @Autowired constructor(
             //        val os = ByteArrayOutputStream()
             //        ImageIO.write(imageBuff, img.substringAfterLast("."), os)
             //        val encodeImage = Base64.getEncoder().withoutPadding().encodeToString(os.toByteArray())
-            var img = Image(Base64.getEncoder().withoutPadding().encodeToString("${decodedID}/$img".toByteArray()), img);
-            dataset.images.add(img)
+            val res = Image(Base64.getEncoder().encodeToString("${decodedID}/$imgWithoudFileEnd".toByteArray()), imgWithoudFileEnd);
+            dataset.images.add(res)
         }
         return dataset
     }
