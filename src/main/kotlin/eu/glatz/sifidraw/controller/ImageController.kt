@@ -39,7 +39,16 @@ class ImageController @Autowired constructor(
             return;
 
         println("post + type " + type)
-        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, image.id + ".type"))
+
+        val dir = File(projectSettings.dir,image.id.substringBeforeLast("/"));
+        println(dir)
+
+        if(!dir.isDirectory) {
+            dir.mkdirs();
+            print("creating dirs")
+        }
+
+        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, "${image.id}.$type"))
         if (image.layers != null && image.layers.isEmpty()) {
             imageRepository.save(image)
         }
