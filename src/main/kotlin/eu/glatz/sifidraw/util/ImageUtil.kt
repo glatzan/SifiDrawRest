@@ -32,7 +32,7 @@ class ImageUtil {
                 val bis = ByteArrayInputStream(decoder)
                 val image = ImageIO.read(bis)
                 bis.close()
-                ImageIO.write(image, "png", file)
+                ImageIO.write(image, "TIFF", file)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
