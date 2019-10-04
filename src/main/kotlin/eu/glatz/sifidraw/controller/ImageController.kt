@@ -45,7 +45,7 @@ class ImageController @Autowired constructor(
         if(!dir.isDirectory)
             dir.mkdirs();
 
-        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, "${decodedID}.tiff"))
+        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, "${decodedID}.$type"))
 
         println(decodedID +" " +image.layers)
 

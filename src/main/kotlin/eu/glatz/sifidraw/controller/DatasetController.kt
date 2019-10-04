@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*
 import java.io.File
 import java.nio.charset.Charset
 import java.util.*
+import kotlin.collections.ArrayList
 
 @CrossOrigin
 @RestController
@@ -18,10 +19,23 @@ class DatasetController @Autowired constructor(
         private val datasetService: DatasetService,
         private val projectSettings: ProjectSettings) {
 
-    @GetMapping("/dataset/{id}")
+     @GetMapping("/dataset/{id}")
     fun getDataset(@PathVariable id: String): Dataset {
         return datasetService.getDataset(id);
     }
+
+    @GetMapping("/datasets/{id}")
+    fun getDatasets(@PathVariable id: String): Array<Dataset> {
+        val result = ArrayList<Dataset>();
+        val arr = id.split("-");
+        for(a in arr){
+            result.add(getDataset(a))
+        }
+
+        return result.toTypedArray();
+    }
+
+
 
     @PostMapping("/dataset/new/{id}")
     fun createDataset(@PathVariable id: String): Boolean {
