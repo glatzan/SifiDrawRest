@@ -11,6 +11,12 @@ imagemagic:
   file: out{}.png
   command: "{executable} {command} {inputfile} {outputfile}"
 
+imagej:
+  dir: D:\Projekte\sididraw\tmp
+  executable: D:\Projekte\Fiji.app\ImageJ-win64.exe
+  file: out{}.png
+  command: "{executable} --headless -macro {macro} {inputfile}#{outputfile}"
+
 spring:
   servlet:
     multipart:

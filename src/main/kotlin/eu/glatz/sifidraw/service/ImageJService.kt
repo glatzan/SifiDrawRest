@@ -1,30 +1,32 @@
 package eu.glatz.sifidraw.service
 
-import eu.glatz.sifidraw.model.Image
-import eu.glatz.sifidraw.util.ImageUtil
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Service
-import java.io.*
-import java.util.ArrayList
-import kotlin.experimental.and
+import java.io.File
 
-
-@ConfigurationProperties(prefix = "imagemagic")
+@ConfigurationProperties(prefix = "imagej")
 @Service
-class ImageMagicService {
-
+class ImageJService @Autowired constructor(
+        private val jsonService: JsonService) {
     var dir: String = ""
     var executable: String = ""
     var file: String = ""
     var command: String = ""
 
-    fun runImageMagic(imageFile: File, userCommand: String): File {
+
+    fun runImageJReturnJson(imageFile: File, makroFile: File): String {
+        val outputFile = runImageJ(imageFile, makroFile)
+        return jsonService.readCsvToJSON(outputFile);
+    }
+
+    fun runImageJ(imageFile: File, makroFile: File): File {
         var command = command.replace("{dir}", dir)
         command = command.replace("{executable}", executable)
-        command = command.replace("{command}", userCommand)
+        command = command.replace("{macro}", makroFile.absolutePath)
         command = command.replace("{inputfile}", imageFile.absolutePath)
 
-        val outputFile = File(imageFile.absolutePath.replace(imageFile.name, imageFile.name.toString().replace(".", "_.")))
+        val outputFile = File(imageFile.absolutePath.replace(imageFile.name, imageFile.name.toString().replaceAfterLast(".", ".csv")))
         command = command.replace("{outputfile}", outputFile.absolutePath)
 
         println("Running post process command: $command")
@@ -35,9 +37,5 @@ class ImageMagicService {
         println("Batch file done.");
 
         return outputFile
-    }
-
-    fun getConvertedImage(file: File): String {
-        return ImageUtil.readImgAsBase64(file)
     }
 }

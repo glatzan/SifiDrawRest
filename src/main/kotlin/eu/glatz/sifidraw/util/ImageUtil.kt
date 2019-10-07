@@ -1,5 +1,6 @@
 package eu.glatz.sifidraw.util
 
+import eu.glatz.sifidraw.model.Image
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
@@ -39,15 +40,23 @@ class ImageUtil {
         }
 
         @JvmStatic
-        fun findImage(path: String, imagePrefix : String) : File{
+        fun findImage(path: String, imagePrefix: String): File {
 
             val base = File(path, imagePrefix.substringBeforeLast("/"))
-            val img = base.listFiles{ current, name -> name.matches(Regex(imagePrefix.substringAfterLast("/")+".*")) }
+            val img = base.listFiles { current, name -> name.matches(Regex(imagePrefix.substringAfterLast("/") + ".*")) }
 
-            if(img.size >= 0)
+            if (img.size >= 0)
                 return img[0];
 
             throw FileNotFoundException();
+        }
+
+        @JvmStatic
+        fun writeUniqueBase64Img(dir : String, file : String, image: Image) : File {
+            val file = File(dir, file.replace("{}", System.currentTimeMillis().toString() + "" + Math.random()))
+            println(file.absolutePath)
+            ImageUtil.writeBase64Img(image.data, file);
+            return file;
         }
     }
 }
