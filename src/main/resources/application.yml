@@ -16,6 +16,7 @@ imagej:
   executable: D:\Projekte\Fiji.app\ImageJ-win64.exe
   file: out{}.png
   command: "{executable} --headless -macro {macro} {inputfile}#{outputfile}"
+  pluginDir: D:\Projekte\Fiji.app\plugins
 
 spring:
   servlet:
