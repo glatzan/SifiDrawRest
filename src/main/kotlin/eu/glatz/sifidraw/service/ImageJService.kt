@@ -32,7 +32,7 @@ class ImageJService @Autowired constructor(
         command = command.replace("{macro}", makroFile.absolutePath)
         command = command.replace("{inputfile}", imageFile.absolutePath)
 
-        val outputFile = File(imageFile.absolutePath.replace(imageFile.name, imageFile.name.toString().replaceAfterLast(".", ".csv")))
+        val outputFile = File(imageFile.absolutePath.replace(imageFile.name, imageFile.name.toString().replaceAfterLast(".", "csv")))
         command = command.replace("{outputfile}", outputFile.absolutePath)
 
         println("Running post process command: $command")

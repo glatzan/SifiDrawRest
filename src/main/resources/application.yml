@@ -9,7 +9,7 @@ imagemagic:
   dir: D:\Projekte\sididraw\tmp
   executable: D:\Projekte\sididraw\imagemagic\convert.exe
   file: out{}.png
-  command: "{executable} {command} {inputfile} {outputfile}"
+  command: "{executable} {inputfile} {command} {outputfile}"
 
 imagej:
   dir: D:\Projekte\sididraw\tmp
