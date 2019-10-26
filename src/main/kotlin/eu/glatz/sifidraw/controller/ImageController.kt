@@ -49,6 +49,8 @@ class ImageController @Autowired constructor(
 
         println(decodedID +" " +image.layers)
 
+        image.data = "";
+
         if (image.layers != null && image.layers.isNotEmpty()) {
             imageRepository.save(image)
         }
