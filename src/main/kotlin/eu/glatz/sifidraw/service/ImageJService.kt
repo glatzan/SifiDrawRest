@@ -8,6 +8,9 @@ import ij.IJ
 import ij.ImageJ
 import ij.io.FileSaver
 import ij.ImagePlus
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 
 @ConfigurationProperties(prefix = "imagej")
@@ -39,7 +42,23 @@ class ImageJService @Autowired constructor(
 
         val process2 = Runtime.getRuntime().exec(command)
         println("Waiting for batch file ...");
-        process2.waitFor();
+        val stderr = process2.getErrorStream()
+        val isr = InputStreamReader(stderr)
+        val br = BufferedReader(isr)
+        var line: String? = null
+        println("<ERROR>")
+        while (true) {
+            var line = br.readLine()
+            if (line != null)
+                println("- > "+line)
+            else break
+        }
+
+
+        println("</ERROR>")
+        val exitVal = process2.waitFor()
+        println("Process exitValue: $exitVal")
+
         println("Batch file done.");
 
         return outputFile
