@@ -46,7 +46,8 @@ class JWTAuthenticationFilter constructor(
                 .withSubject((auth.principal as org.springframework.security.core.userdetails.User).username)
                 .withExpiresAt(Date(System.currentTimeMillis() + eu.glatz.sifidraw.config.SecurityConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(eu.glatz.sifidraw.config.SecurityConstants.SECRET.toByteArray()))
-        res.addHeader(eu.glatz.sifidraw.config.SecurityConstants.HEADER_STRING, eu.glatz.sifidraw.config.SecurityConstants.TOKEN_PREFIX.toString() + token)
+        res.status = HttpServletResponse.SC_OK
+        res.writer.write("{\"expires\" : \"${SecurityConstants.EXPIRATION_TIME}\", \"token\" : \"${eu.glatz.sifidraw.config.SecurityConstants.TOKEN_PREFIX.toString() + token}\"}")
     }
 
 }
