@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import java.util.*
 
 
 @EnableWebSecurity
@@ -38,24 +39,24 @@ class SecurityConfig @Autowired constructor(
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder())
     }
 
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource? {
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", CorsConfiguration().applyPermitDefaultValues())
-        return source
-    }
-
-    //    @Bean
-//    fun corsConfigurationSource(): CorsConfigurationSource {
-//        val configuration = CorsConfiguration()
-//        configuration.allowedOrigins = Arrays.asList("*")
-//        configuration.allowedMethods = Arrays.asList("*")
-//        configuration.allowedHeaders = Arrays.asList("*")
-//        configuration.allowCredentials = true
+//    @Bean
+//    fun corsConfigurationSource(): CorsConfigurationSource? {
 //        val source = UrlBasedCorsConfigurationSource()
-//        source.registerCorsConfiguration("/**", configuration)
+//        source.registerCorsConfiguration("/**", CorsConfiguration().applyPermitDefaultValues())
 //        return source
 //    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = Arrays.asList("*")
+        configuration.allowedMethods = Arrays.asList("*")
+        configuration.allowedHeaders = Arrays.asList("*")
+        configuration.allowCredentials = true
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
+    }
 
     @Bean
     fun bCryptPasswordEncoder(): BCryptPasswordEncoder? {

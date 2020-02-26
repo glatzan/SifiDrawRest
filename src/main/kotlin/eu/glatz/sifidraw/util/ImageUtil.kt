@@ -1,13 +1,12 @@
 package eu.glatz.sifidraw.util
 
 import eu.glatz.sifidraw.model.Image
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.*
 import javax.imageio.ImageIO
-import java.io.ByteArrayInputStream
-import java.awt.image.BufferedImage
-import java.io.FileNotFoundException
 
 
 class ImageUtil {
@@ -28,9 +27,13 @@ class ImageUtil {
 
         @JvmStatic
         fun writeBase64Img(imageString: String, file: File) {
+            writeImg(Base64.getDecoder().decode(imageString), file)
+        }
+
+        @JvmStatic
+        fun writeImg(bytes: ByteArray, file: File) {
             try {
-                val decoder = Base64.getDecoder().decode(imageString)
-                val bis = ByteArrayInputStream(decoder)
+                val bis = ByteArrayInputStream(bytes)
                 val image = ImageIO.read(bis)
                 bis.close()
                 ImageIO.write(image, "png", file)

@@ -2,20 +2,11 @@ package eu.glatz.sifidraw.service
 
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Dataset
-import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.model.ProjectData
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Service
 import java.io.File
-import org.springframework.core.io.ClassPathResource
-import java.nio.file.Files
 import java.util.*
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
-import java.awt.Color
-import javax.swing.Spring.height
 
 
 @Service
@@ -30,9 +21,15 @@ class ProjectService @Autowired constructor(
 
         projects.forEach {
             val project = File(base, it.id)
-            it.datasets = project.list { current, name -> File(current, name).isDirectory && !name.startsWith(".")}.map { dir -> Dataset(Base64.getEncoder().encodeToString("${it.id}/$dir".toByteArray()), dir) }
+            it.datasets = project.list { current, name -> File(current, name).isDirectory && !name.startsWith(".") }.map { dir -> Dataset(Base64.getEncoder().encodeToString("${it.id}/$dir".toByteArray()), dir) }
         }
 
         return projects
+    }
+
+    public fun createProject(dir: String) {
+        val base = File(projectSettings.dir)
+        val newProject = File(base, dir);
+        newProject.mkdirs();
     }
 }
