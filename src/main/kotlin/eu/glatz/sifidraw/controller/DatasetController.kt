@@ -2,11 +2,9 @@ package eu.glatz.sifidraw.controller
 
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Dataset
-import eu.glatz.sifidraw.model.ProjectData
+import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.service.DatasetService
-import eu.glatz.sifidraw.service.ProjectService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.io.File
 import java.nio.charset.Charset
@@ -19,16 +17,17 @@ class DatasetController @Autowired constructor(
         private val datasetService: DatasetService,
         private val projectSettings: ProjectSettings) {
 
-     @GetMapping("/dataset/{id}")
+    @GetMapping("/dataset/{id}")
     fun getDataset(@PathVariable id: String): Dataset {
         return datasetService.getDataset(id);
     }
 
-    @GetMapping("/datasets/{id}")
-    fun getDatasets(@PathVariable id: String): Array<Dataset> {
+    @GetMapping("/datasets/{datasets}")
+    fun getDatasets(@PathVariable datasets: String): Array<Dataset> {
+        val decodedDatasets = String(Base64.getDecoder().decode(datasets), Charset.forName("UTF-8"))
         val result = ArrayList<Dataset>();
-        val arr = id.split("-");
-        for(a in arr){
+        val arr = decodedDatasets.split("-");
+        for (a in arr) {
             result.add(getDataset(a))
         }
 
@@ -43,4 +42,16 @@ class DatasetController @Autowired constructor(
         return f.mkdir();
     }
 
+    @PostMapping("/dataset/addImage")
+    fun addImageToDataset(@RequestBody request: ImageAddRequest?) {
+        if (request == null)
+            throw IllegalArgumentException("Arguments not valid")
+
+        datasetService.addImageToDataset(request.dataset, request.image)
+    }
+
+    class ImageAddRequest {
+        lateinit var image: Image
+        lateinit var dataset: Dataset
+    }
 }

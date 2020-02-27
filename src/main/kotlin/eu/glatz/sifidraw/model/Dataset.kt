@@ -7,7 +7,7 @@ class Dataset {
 
     var id: String
     var name : String
-    var images = mutableListOf<Image>()
+    var images = mutableListOf<IImage>()
 
     constructor(id: String, name: String) {
         this.id = id
