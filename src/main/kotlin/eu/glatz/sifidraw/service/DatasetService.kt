@@ -5,6 +5,7 @@ import eu.glatz.sifidraw.model.Dataset
 import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.model.ImageGroup
 import eu.glatz.sifidraw.repository.ImageGroupRepository
+import eu.glatz.sifidraw.repository.ImageRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
@@ -16,7 +17,8 @@ import java.util.*
 class DatasetService @Autowired constructor(
         private val projectSettings: ProjectSettings,
         private val imageGroupRepository: ImageGroupRepository,
-        private val imageService: ImageService) : AbstractService() {
+        private val imageService: ImageService,
+        private val imageRepository: ImageRepository) : AbstractService() {
 
     public fun getDataset(id: String): Dataset {
         if ("" == id)
@@ -64,9 +66,9 @@ class DatasetService @Autowired constructor(
         val resultList = mutableListOf<Image>()
         val images = folder.list { _, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) } ?: return resultList
         for (img in images) {
-            val imgWithoutFileEnd = img.substringBeforeLast(".")
-            val res = Image(Base64.getEncoder().encodeToString("${decodedID}/$imgWithoutFileEnd".toByteArray()), imgWithoutFileEnd);
-            resultList.add(res)
+            val imageWithoutFileEnd = img.substringBeforeLast(".")
+            val imageID = Base64.getEncoder().encodeToString("${decodedID}/$img".toByteArray())
+            resultList.add(imageRepository.findById(imageID).orElse(Image(imageID, imageWithoutFileEnd)))
         }
         return resultList
     }

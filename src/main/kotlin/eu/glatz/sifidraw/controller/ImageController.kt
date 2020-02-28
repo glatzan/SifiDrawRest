@@ -22,14 +22,13 @@ class ImageController @Autowired constructor(
     fun getImageData(@PathVariable id: String): Image {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
         val img = imageRepository.findById(id).orElse(Image(id, decodedID.substringAfterLast("/")))
-        img.data = ImageUtil.readImgAsBase64(ImageUtil.findImage(projectSettings.dir, decodedID))
+        img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, decodedID))
         return img
     }
 
-    @PutMapping("/image")
-    fun modifyImageData(@RequestBody image: Image): Image {
+    @PutMapping("/image/update")
+    fun updateImageData(@RequestBody image: Image): Image {
         println("put")
-        image.data = ""
         return imageRepository.save(image)
     }
 
@@ -49,8 +48,6 @@ class ImageController @Autowired constructor(
         ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, "${decodedID}.$type"))
 
         println(decodedID +" " +image.layers)
-
-        image.data = "";
 
         if (image.layers != null && image.layers.isNotEmpty()) {
             imageRepository.save(image)

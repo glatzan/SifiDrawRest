@@ -34,7 +34,6 @@ class DatasetController @Autowired constructor(
         return result.toTypedArray();
     }
 
-
     @PostMapping("/dataset/new/{id}")
     fun createDataset(@PathVariable id: String): Boolean {
         val f = File(projectSettings.dir, String(Base64.getDecoder().decode(id), Charset.forName("UTF-8")))
