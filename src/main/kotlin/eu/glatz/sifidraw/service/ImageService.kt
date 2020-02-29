@@ -4,6 +4,7 @@ import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.repository.ImageGroupRepository
 import eu.glatz.sifidraw.repository.ImageRepository
+import eu.glatz.sifidraw.util.ImageUtil
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -40,5 +41,24 @@ class ImageService @Autowired constructor(
 
         image.id = Base64.getEncoder().encodeToString(newImageID.toByteArray())
         return imageRepository.save(image)
+    }
+
+    fun getImage(imagePath: String, loadImageData: Boolean): Image {
+        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+        val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+        if (loadImageData)
+            img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, imagePath))
+        return img
+    }
+
+    fun getImagesOfFolder(folderPath: String, loadImageData: Boolean): List<Image> {
+        val folder = File(projectSettings.dir, folderPath);
+        val fixedFolderPath = folderPath + if (!folderPath.endsWith("/")) "/" else ""
+        val resultList = mutableListOf<Image>()
+        val images = folder.list { _, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) } ?: return resultList
+        for (img in images) {
+            resultList.add(getImage("${folderPath}$img", loadImageData))
+        }
+        return resultList
     }
 }

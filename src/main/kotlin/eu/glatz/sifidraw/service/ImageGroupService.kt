@@ -25,14 +25,15 @@ class ImageGroupService @Autowired constructor(
         val uuid = UUID.randomUUID()
         val randomUUIDString = uuid.toString()
 
-        val datasetDir = File(dataSetPath, randomUUIDString);
-        val absoluteDatasetDir = File(projectSettings.dir, datasetDir.path)
+        val imageGroupPath = File(dataSetPath, randomUUIDString);
+        val absoluteImageGroupPath = File(projectSettings.dir, imageGroupPath.path)
 
-        return if (absoluteDatasetDir.exists())
+        return if (absoluteImageGroupPath.exists())
             throw IllegalArgumentException("Folder exists")
         else {
-            absoluteDatasetDir.mkdirs();
-            val newImgGroup = ImageGroup(Base64.getEncoder().encodeToString(datasetDir.path.replace("\\", "/").toByteArray()), groupName);
+            absoluteImageGroupPath.mkdirs();
+            val fixedFolderPath = (imageGroupPath.path + if (!imageGroupPath.path.endsWith("/")) "/" else "").replace("\\", "/")
+            val newImgGroup = ImageGroup(Base64.getEncoder().encodeToString(fixedFolderPath.toByteArray()), groupName);
             imageGroupRepository.save(newImgGroup)
         }
     }
@@ -46,5 +47,17 @@ class ImageGroupService @Autowired constructor(
         val imgName = image.id.substringAfterLast("/")
         imageRepository.delete(image)
         return imageGroupRepository.save(imageGroup)
+    }
+
+    fun getImageGroup(imageGroupPath: String, loadImageData: Boolean): ImageGroup {
+        val folder = File(projectSettings.dir, imageGroupPath);
+        val fixedFolderPath = imageGroupPath + if (!imageGroupPath.endsWith("/")) "/" else ""
+        if (folder.isDirectory) {
+            val base64ID = String(Base64.getEncoder().encodeToString(fixedFolderPath.toByteArray()).toByteArray(), Charset.forName("UTF-8"))
+            val imageGroup = imageGroupRepository.findById(base64ID).orElse(ImageGroup(base64ID, folder.name))
+            imageGroup.images.addAll(imageService.getImagesOfFolder(fixedFolderPath, loadImageData))
+            return imageGroup
+        }
+        throw java.lang.IllegalArgumentException("ImageGroup not found")
     }
 }

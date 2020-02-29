@@ -19,7 +19,8 @@ class DatasetController @Autowired constructor(
 
     @GetMapping("/dataset/{id}")
     fun getDataset(@PathVariable id: String): Dataset {
-        return datasetService.getDataset(id);
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+        return datasetService.getDataset(decodedID);
     }
 
     @GetMapping("/datasets/{datasets}")

@@ -3,7 +3,6 @@ package eu.glatz.sifidraw.service
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Dataset
 import eu.glatz.sifidraw.model.Image
-import eu.glatz.sifidraw.model.ImageGroup
 import eu.glatz.sifidraw.repository.ImageGroupRepository
 import eu.glatz.sifidraw.repository.ImageRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,31 +17,28 @@ class DatasetService @Autowired constructor(
         private val projectSettings: ProjectSettings,
         private val imageGroupRepository: ImageGroupRepository,
         private val imageService: ImageService,
+        private val imageGroupService: ImageGroupService,
         private val imageRepository: ImageRepository) : AbstractService() {
 
-    public fun getDataset(id: String): Dataset {
-        if ("" == id)
+    public fun getDataset(datasetPath: String): Dataset {
+        if ("" == datasetPath)
             throw IllegalArgumentException("");
 
-        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+        val fixedDatasetPath = datasetPath + if (!datasetPath.endsWith("/")) "/" else ""
+        val id = Base64.getEncoder().encodeToString(fixedDatasetPath.toByteArray())
+        val dataset = Dataset(id, fixedDatasetPath.substringBeforeLast("/").substringAfterLast("/"))
+        val absoluteDatasetPath = File(projectSettings.dir, fixedDatasetPath)
 
-        val dataset = Dataset(id, decodedID.substringAfterLast("/"))
-        val base = File(projectSettings.dir, decodedID)
 
-        if (!base.isDirectory)
-            throw IllegalArgumentException("");
+        if (!absoluteDatasetPath.isDirectory)
+            throw IllegalArgumentException("Dataset not found");
 
-        val files = base.listFiles()
+        val files = absoluteDatasetPath.listFiles()
         if (files != null && files.isNotEmpty()) {
-            dataset.images.addAll(getImagesOfFolder(decodedID, base))
-
+            dataset.images.addAll(this.imageService.getImagesOfFolder(fixedDatasetPath, false))
             for (folder in files) {
                 if (folder.isDirectory) {
-                    val imageGroupID = (decodedID + "/" + folder.name)
-                    val base64ID = String(Base64.getEncoder().encodeToString(imageGroupID.toByteArray()).toByteArray(), Charset.forName("UTF-8"))
-                    val imageGroup = imageGroupRepository.findById(base64ID).orElse(ImageGroup(base64ID, folder.name))
-                    imageGroup.images.addAll(getImagesOfFolder(imageGroupID, folder))
-                    dataset.images.add(imageGroup)
+                    dataset.images.add(imageGroupService.getImageGroup("${fixedDatasetPath}${folder.name}", false))
                 }
             }
         }
@@ -60,17 +56,6 @@ class DatasetService @Autowired constructor(
 
 
         return dataset
-    }
-
-    private fun getImagesOfFolder(decodedID: String, folder: File): MutableList<Image> {
-        val resultList = mutableListOf<Image>()
-        val images = folder.list { _, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) } ?: return resultList
-        for (img in images) {
-            val imageWithoutFileEnd = img.substringBeforeLast(".")
-            val imageID = Base64.getEncoder().encodeToString("${decodedID}/$img".toByteArray())
-            resultList.add(imageRepository.findById(imageID).orElse(Image(imageID, imageWithoutFileEnd)))
-        }
-        return resultList
     }
 
     fun addImageToDataset(dataset: Dataset, image: Image): Image {

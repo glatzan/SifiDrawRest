@@ -3,6 +3,7 @@ package eu.glatz.sifidraw.controller
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.repository.ImageRepository
+import eu.glatz.sifidraw.service.ImageService
 import eu.glatz.sifidraw.util.ImageUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -16,14 +17,13 @@ import java.util.*
 @RestController
 class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
+        private val imageService: ImageService,
         private val projectSettings: ProjectSettings) {
 
     @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        val img = imageRepository.findById(id).orElse(Image(id, decodedID.substringAfterLast("/")))
-        img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, decodedID))
-        return img
+        return imageService.getImage(decodedID,true)
     }
 
     @PutMapping("/image/update")
