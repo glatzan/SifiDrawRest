@@ -15,7 +15,7 @@ import java.util.*
 class ImageJController @Autowired constructor(
         private val imageJService: ImageJService) {
 
-    @PostMapping(value = "/imagej/lines")
+    @PostMapping("/imagej/lines")
     fun processImageReturnJSON(@RequestBody image: Image): String {
 
         val file = ImageUtil.writeUniqueBase64Img(imageJService.dir, imageJService.file, image)

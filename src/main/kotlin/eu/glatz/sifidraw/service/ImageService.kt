@@ -45,11 +45,32 @@ class ImageService @Autowired constructor(
 
     fun getImage(imagePath: String, loadImageData: Boolean): Image {
         val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+       val time = System.currentTimeMillis()
         val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
-        if (loadImageData)
+        if (loadImageData) {
             img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, imagePath))
+        }
+        println("time " + (System.currentTimeMillis()-time))
         return img
     }
+//    return runBlocking {
+//        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+//        var data = ""
+//        if (loadImageData) {
+//            val time = System.currentTimeMillis()
+//            val job = GlobalScope.launch {
+//                data = ImageUtil.readImgAsBase64(File(projectSettings.dir, imagePath))
+//            }
+//            val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+//            job.join()
+//            img.data = data
+//            println("time " + (System.currentTimeMillis()-time))
+//            return@runBlocking img
+//        } else {
+//            val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+//            return@runBlocking img
+//        }
+//    }
 
     fun getImagesOfFolder(folderPath: String, loadImageData: Boolean): List<Image> {
         val folder = File(projectSettings.dir, folderPath);

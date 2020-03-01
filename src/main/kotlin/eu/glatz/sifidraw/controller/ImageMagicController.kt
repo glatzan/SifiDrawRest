@@ -13,7 +13,7 @@ import java.util.*
 class ImageMagicController @Autowired constructor(
         private val imageMagicService: ImageMagicService) {
 
-    @PostMapping(value = "/magic/{command}")
+    @PostMapping("/magic/{command}")
     fun modifyImageData(@RequestBody image: Image, @PathVariable command: String): Image {
         println("put " + command)
         val command = String(Base64.getDecoder().decode(command), Charset.forName("UTF-8"))
