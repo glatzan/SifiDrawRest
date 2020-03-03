@@ -60,7 +60,7 @@ class DatasetService @Autowired constructor(
 
     fun addImageToDataset(dataset: Dataset, image: Image): Image {
         val groupDir = String(Base64.getDecoder().decode(dataset.id), Charset.forName("UTF-8"))
-        return this.imageService.addImageToPath(groupDir, image)
+        return this.imageService.moveAndAddImageToPath(groupDir, image)
     }
 }
 

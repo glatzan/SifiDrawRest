@@ -18,7 +18,7 @@ class ImageService @Autowired constructor(
         private val imageGroupRepository: ImageGroupRepository,
         private val imageRepository: ImageRepository) : AbstractService() {
 
-    fun addImageToPath(path: String, image: Image): Image {
+    fun moveAndAddImageToPath(path: String, image: Image): Image {
         val imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
         val imgName = imagePath.substringAfterLast("/")
 
@@ -40,6 +40,23 @@ class ImageService @Autowired constructor(
         imageRepository.delete(image)
 
         image.id = Base64.getEncoder().encodeToString(newImageID.toByteArray())
+        return imageRepository.save(image)
+    }
+
+    fun addNewImageToPath(image: Image, type: String): Image {
+        var imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
+        imagePath += if (imagePath.endsWith(type)) "" else type
+
+        var targetPathFile = File(projectSettings.dir, imagePath);
+        if (targetPathFile.exists()) {
+            val uuid = UUID.randomUUID()
+            val randomUUIDString = uuid.toString()
+            val newPath = imagePath.substringBeforeLast("/") + "/" +randomUUIDString + "." + imagePath.substringAfterLast(".")
+            image.id = Base64.getEncoder().encodeToString(newPath.toByteArray())
+            targetPathFile = File(projectSettings.dir, newPath);
+        }
+
+        ImageUtil.writeBase64Img(image.data, targetPathFile)
         return imageRepository.save(image)
     }
 

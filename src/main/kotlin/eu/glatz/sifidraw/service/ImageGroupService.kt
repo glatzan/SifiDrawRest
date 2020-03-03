@@ -40,7 +40,7 @@ class ImageGroupService @Autowired constructor(
 
     fun addImageToGroup(imageGroup: ImageGroup, image: Image): Image {
         val groupDir = String(Base64.getDecoder().decode(imageGroup.id), Charset.forName("UTF-8"))
-        return this.imageService.addImageToPath(groupDir, image)
+        return this.imageService.moveAndAddImageToPath(groupDir, image)
     }
 
     fun removeImageFromGroup(imageGroup: ImageGroup, image: Image): ImageGroup {

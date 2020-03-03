@@ -38,20 +38,7 @@ class ImageController @Autowired constructor(
         if (!type.matches(Regex("jpg|png|tif")))
             return;
 
-        val decodedID = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
-
-        val dir = File(projectSettings.dir,decodedID.substringBeforeLast("/"));
-
-        if(!dir.isDirectory)
-            dir.mkdirs();
-
-        ImageUtil.writeBase64Img(image.data, File(projectSettings.dir, "${decodedID}.$type"))
-
-        println(decodedID +" " +image.layers)
-
-        if (image.layers != null && image.layers.isNotEmpty()) {
-            imageRepository.save(image)
-        }
+        imageService.addNewImageToPath(image, ".$type")
     }
 
 
