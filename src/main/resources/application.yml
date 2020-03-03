@@ -1,18 +1,18 @@
 settings:
-  dir: D:\Projekte\sididraw
+  dir: D:\Projekte\sifidraw
 
 database:
   port: 27017
   host: localhost
 
 imagemagic:
-  dir: D:\Projekte\sididraw\tmp
-  executable: D:\Projekte\sididraw\imagemagic\convert.exe
+  dir: D:\Projekte\sifidraw\tmp
+  executable: D:\Projekte\sifidraw\imagemagic\convert.exe
   file: out{}.png
   command: "{executable} {inputfile} {command} {outputfile}"
 
 imagej:
-  dir: D:\Projekte\sididraw\tmp
+  dir: D:\Projekte\sifidraw\tmp
   executable: D:\Projekte\Fiji.app\ImageJ-win64.exe
   file: out{}.png
   command: "{executable} --headless -macro {macro} {inputfile}#{outputfile}"

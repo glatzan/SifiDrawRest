@@ -45,12 +45,10 @@ class ImageService @Autowired constructor(
 
     fun getImage(imagePath: String, loadImageData: Boolean): Image {
         val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
-       val time = System.currentTimeMillis()
         val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
         if (loadImageData) {
             img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, imagePath))
         }
-        println("time " + (System.currentTimeMillis()-time))
         return img
     }
 //    return runBlocking {
