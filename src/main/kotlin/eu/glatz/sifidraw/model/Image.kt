@@ -7,6 +7,9 @@ class Image(id: String, name: String) : IImage(id, name) {
     @Transient
     var data: String = ""
 
+    @Transient
+    open var fileExtension : String = ""
+
     var width = 0
     var height = 0
 

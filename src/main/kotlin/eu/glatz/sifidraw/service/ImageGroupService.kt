@@ -49,13 +49,13 @@ class ImageGroupService @Autowired constructor(
         return imageGroupRepository.save(imageGroup)
     }
 
-    fun getImageGroup(imageGroupPath: String, loadImageData: Boolean): ImageGroup {
+    fun getImageGroup(imageGroupPath: String, loadImageData: Boolean, format : String = "png"): ImageGroup {
         val folder = File(projectSettings.dir, imageGroupPath);
         val fixedFolderPath = imageGroupPath + if (!imageGroupPath.endsWith("/")) "/" else ""
         if (folder.isDirectory) {
             val base64ID = String(Base64.getEncoder().encodeToString(fixedFolderPath.toByteArray()).toByteArray(), Charset.forName("UTF-8"))
             val imageGroup = imageGroupRepository.findById(base64ID).orElse(ImageGroup(base64ID, folder.name))
-            imageGroup.images.addAll(imageService.getImagesOfFolder(fixedFolderPath, loadImageData))
+            imageGroup.images.addAll(imageService.getImagesOfFolder(fixedFolderPath, loadImageData,format))
             return imageGroup
         }
         throw java.lang.IllegalArgumentException("ImageGroup not found")

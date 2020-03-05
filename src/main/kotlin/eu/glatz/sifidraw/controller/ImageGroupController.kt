@@ -35,9 +35,9 @@ class ImageGroupController @Autowired constructor(
     }
 
     @GetMapping("/imagegroup/{id}")
-    fun getImageGroupData(@PathVariable id: String): ImageGroup {
+    fun getImageGroupData(@PathVariable id: String, @RequestParam("format") format: Optional<String>): ImageGroup {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        return imageGroupService.getImageGroup(decodedID, true)
+        return imageGroupService.getImageGroup(decodedID, true, format.orElse("png"))
     }
 
     @PutMapping("/imagegroup/update")

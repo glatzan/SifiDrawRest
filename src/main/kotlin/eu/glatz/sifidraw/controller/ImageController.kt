@@ -23,10 +23,10 @@ class ImageController @Autowired constructor(
         private val projectSettings: ProjectSettings) {
 
     @GetMapping("/image/{id}")
-    fun getImageData(@PathVariable id: String): Image {
+    fun getImageData(@PathVariable id: String, @RequestParam("format") format: Optional<String>): Image {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
         try {
-            return imageService.getImage(decodedID, true)
+            return imageService.getImage(decodedID, true, format.orElse("png"))
         } catch (e: IOException) {
             return Image("-", "-")
         }

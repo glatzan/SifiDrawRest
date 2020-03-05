@@ -65,7 +65,7 @@ class ImageService @Autowired constructor(
         return imageRepository.save(image)
     }
 
-    fun getImage(imagePath: String, loadImageData: Boolean): Image {
+    fun getImage(imagePath: String, loadImageData: Boolean, format: String = "png"): Image {
         val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
         val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
 
@@ -73,7 +73,8 @@ class ImageService @Autowired constructor(
             val readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
             img.width = readImg.width
             img.height = readImg.height
-            img.data = ImageUtil.imageToBase64(readImg)
+            img.data = ImageUtil.imageToBase64(readImg, format)
+            img.fileExtension = format
         }
 
         return img
@@ -107,13 +108,13 @@ class ImageService @Autowired constructor(
         }
     }
 
-    fun getImagesOfFolder(folderPath: String, loadImageData: Boolean): List<Image> {
+    fun getImagesOfFolder(folderPath: String, loadImageData: Boolean, format: String = "png"): List<Image> {
         val folder = File(projectSettings.dir, folderPath);
         val fixedFolderPath = folderPath + if (!folderPath.endsWith("/")) "/" else ""
         val resultList = mutableListOf<Image>()
         val images = folder.list { _, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) } ?: return resultList
         for (img in images) {
-            resultList.add(getImage("${folderPath}$img", loadImageData))
+            resultList.add(getImage("${folderPath}$img", loadImageData, format))
         }
 
         resultList.sortBy { it.name }

@@ -15,15 +15,19 @@ class ImageUtil {
         fun readImageAsBufferedImage(file: File): BufferedImage {
             println(file.absolutePath + " " + file.isFile)
             if (file.isFile) {
-                return ImageIO.read(file)
+                val tmp = ImageIO.read(file)
+                val imageRGB = BufferedImage(tmp.width,
+                        tmp.height, BufferedImage.TYPE_INT_RGB)
+                imageRGB.createGraphics().drawImage(tmp, null, null);
+                return imageRGB;
             }
             throw IOException("Not Image File")
         }
 
         @JvmStatic
-        fun imageToBase64(img: BufferedImage): String {
+        fun imageToBase64(img: BufferedImage, format: String): String {
             val os = ByteArrayOutputStream()
-            ImageIO.write(img, "png", os)
+            ImageIO.write(img, format, os)
             return Base64.getEncoder().encodeToString(os.toByteArray())
         }
 
