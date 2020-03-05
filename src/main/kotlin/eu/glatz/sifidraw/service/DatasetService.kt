@@ -3,6 +3,7 @@ package eu.glatz.sifidraw.service
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Dataset
 import eu.glatz.sifidraw.model.Image
+import eu.glatz.sifidraw.model.ImageGroup
 import eu.glatz.sifidraw.repository.ImageGroupRepository
 import eu.glatz.sifidraw.repository.ImageRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,11 +37,17 @@ class DatasetService @Autowired constructor(
         val files = absoluteDatasetPath.listFiles()
         if (files != null && files.isNotEmpty()) {
             dataset.images.addAll(this.imageService.getImagesOfFolder(fixedDatasetPath, false))
+
+            var tmpList = mutableListOf<ImageGroup>()
             for (folder in files) {
                 if (folder.isDirectory) {
-                    dataset.images.add(imageGroupService.getImageGroup("${fixedDatasetPath}${folder.name}", false))
+                    tmpList.add(imageGroupService.getImageGroup("${fixedDatasetPath}${folder.name}", false))
                 }
             }
+
+            tmpList.sortBy { it.name }
+
+            dataset.images.addAll(tmpList)
         }
 //        Collections.sort(list, object : Comparator<String> {
 //            override fun compare(o1: String, o2: String): Int {

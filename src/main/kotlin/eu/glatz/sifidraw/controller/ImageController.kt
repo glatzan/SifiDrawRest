@@ -1,5 +1,6 @@
 package eu.glatz.sifidraw.controller
 
+import com.google.gson.Gson
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.repository.ImageRepository
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
+import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
 
@@ -23,13 +25,30 @@ class ImageController @Autowired constructor(
     @GetMapping("/image/{id}")
     fun getImageData(@PathVariable id: String): Image {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        return imageService.getImage(decodedID,true)
+        try {
+            return imageService.getImage(decodedID, true)
+        } catch (e: IOException) {
+            return Image("-", "-")
+        }
     }
 
     @PutMapping("/image/update")
     fun updateImageData(@RequestBody image: Image): Image {
         println("put")
         return imageRepository.save(image)
+    }
+
+    @PutMapping("/image/update/checked")
+    fun updateAndCheckImageData(@RequestBody image: Image): Image {
+        return if (imageService.imageExist(image.id)) {
+            println("image ok update" + image.name)
+            imageRepository.save(image)
+        } else {
+            val img = Gson().toJson(image)
+            println("Image not found!")
+            println(img)
+            Image("-", "-")
+        }
     }
 
     @PostMapping("/image/{type}")
@@ -64,12 +83,12 @@ class ImageController @Autowired constructor(
 
             var fileToWrite = File(decodedPathAbs, multipartFile.originalFilename);
 
-            if(!overwriteB) {
+            if (!overwriteB) {
                 var i = -1;
                 do {
                     i++;
                     val tmp: String = if (i <= 0) multipartFile.originalFilename
-                            ?: "noName" else "${(i+96).toChar()}_${multipartFile.originalFilename ?: "noName"}"
+                            ?: "noName" else "${(i + 96).toChar()}_${multipartFile.originalFilename ?: "noName"}"
                     fileToWrite = File(decodedPathAbs, tmp)
                 } while (fileToWrite.exists() && i < 100)
             }

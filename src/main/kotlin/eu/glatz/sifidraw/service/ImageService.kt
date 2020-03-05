@@ -47,11 +47,16 @@ class ImageService @Autowired constructor(
         var imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
         imagePath += if (imagePath.endsWith(type)) "" else type
 
+        val basePath = imagePath.substringBeforeLast("/") + "/"
+        val basePathFile = File(projectSettings.dir, basePath)
+        if (!basePathFile.exists())
+            basePathFile.mkdirs()
+
         var targetPathFile = File(projectSettings.dir, imagePath);
         if (targetPathFile.exists()) {
             val uuid = UUID.randomUUID()
             val randomUUIDString = uuid.toString()
-            val newPath = imagePath.substringBeforeLast("/") + "/" +randomUUIDString + "." + imagePath.substringAfterLast(".")
+            val newPath = basePath + randomUUIDString + "." + imagePath.substringAfterLast(".")
             image.id = Base64.getEncoder().encodeToString(newPath.toByteArray())
             targetPathFile = File(projectSettings.dir, newPath);
         }
@@ -63,29 +68,44 @@ class ImageService @Autowired constructor(
     fun getImage(imagePath: String, loadImageData: Boolean): Image {
         val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
         val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+
         if (loadImageData) {
-            img.data = ImageUtil.readImgAsBase64(File(projectSettings.dir, imagePath))
+            val readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
+            img.width = readImg.width
+            img.height = readImg.height
+            img.data = ImageUtil.imageToBase64(readImg)
         }
+
         return img
     }
-//    return runBlocking {
-//        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
-//        var data = ""
-//        if (loadImageData) {
-//            val time = System.currentTimeMillis()
-//            val job = GlobalScope.launch {
-//                data = ImageUtil.readImgAsBase64(File(projectSettings.dir, imagePath))
-//            }
-//            val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
-//            job.join()
-//            img.data = data
-//            println("time " + (System.currentTimeMillis()-time))
-//            return@runBlocking img
-//        } else {
-//            val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
-//            return@runBlocking img
-//        }
-//    }
+
+    fun imageExist(imagePath: String): Boolean {
+        val id = String(Base64.getDecoder().decode(imagePath), Charset.forName("UTF-8"))
+        val imgFile = File(projectSettings.dir, id)
+        return imgFile.isFile;
+    }
+
+    fun deleteImage(imagePath: String) {
+        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+        val imgFile = File(projectSettings.dir, imagePath)
+        if (imgFile.isFile) {
+            imgFile.delete();
+            val obj = imageRepository.findById(id);
+            if (!obj.isPresent)
+                return
+            imageRepository.delete(obj.get())
+        }
+    }
+
+    fun getDeleteImagesOfFolder(folderPath: String) {
+        val folder = File(projectSettings.dir, folderPath);
+        val fixedFolderPath = folderPath + if (!folderPath.endsWith("/")) "/" else ""
+        val resultList = mutableListOf<Image>()
+        val images = folder.list { _, name -> name.matches(Regex(".*((.jpg)|(.png)|(.tif))")) } ?: return
+        for (img in images) {
+            deleteImage("${folderPath}$img")
+        }
+    }
 
     fun getImagesOfFolder(folderPath: String, loadImageData: Boolean): List<Image> {
         val folder = File(projectSettings.dir, folderPath);
@@ -95,6 +115,8 @@ class ImageService @Autowired constructor(
         for (img in images) {
             resultList.add(getImage("${folderPath}$img", loadImageData))
         }
+
+        resultList.sortBy { it.name }
         return resultList
     }
 }
