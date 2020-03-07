@@ -5,11 +5,10 @@ import eu.glatz.sifidraw.repository.UserSettingsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.*
 
+@CrossOrigin
+@RestController
 class UserSettingsController @Autowired constructor(
         private val userSettingsRepository: UserSettingsRepository) {
 
@@ -24,7 +23,7 @@ class UserSettingsController @Autowired constructor(
         }
     }
 
-    @GetMapping("/user/settings/{id}}")
+    @GetMapping("/user/settings/{id}")
     fun getUserSettings(@PathVariable id: String): UserSettings {
         return userSettingsRepository.findById(id).orElse(UserSettings(id))
     }
