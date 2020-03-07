@@ -68,10 +68,13 @@ class ImageGroupService @Autowired constructor(
         if(folder.isDirectory) {
             val base64ID = String(Base64.getEncoder().encodeToString(fixedFolderPath.toByteArray()).toByteArray(), Charset.forName("UTF-8"))
             imageService.getDeleteImagesOfFolder(fixedFolderPath)
+            folder.delete()
+
             val imageGroup = imageGroupRepository.findById(base64ID)
             if (!imageGroup.isPresent)
                 return
             imageGroupRepository.delete(imageGroup.get())
+
         }
     }
 }

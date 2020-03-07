@@ -61,15 +61,11 @@ class ImageController @Autowired constructor(
     }
 
 
-    @DeleteMapping("/image/{id}")
-    fun deleteImageData(@PathVariable id: String) {
-
+    @DeleteMapping("/image/delete/{id}")
+    fun deleteImageData(@PathVariable id: String): String {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-
-        val obj = imageRepository.findById(decodedID);
-        if (!obj.isPresent)
-            return
-        imageRepository.delete(obj.get())
+        imageService.deleteImage(decodedID)
+        return ""
     }
 
     @PostMapping("/image/upload/{path}&{overwrite}")

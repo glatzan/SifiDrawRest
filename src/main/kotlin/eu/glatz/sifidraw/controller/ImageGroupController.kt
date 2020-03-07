@@ -50,13 +50,8 @@ class ImageGroupController @Autowired constructor(
 
     @DeleteMapping("/imagegroup/delete/{id}")
     fun deleteImageGroupData(@PathVariable id: String) {
-
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-
-        val obj = imageRepository.findById(decodedID);
-        if (!obj.isPresent)
-            return
-        imageRepository.delete(obj.get())
+        imageGroupService.deleteImageGroup(decodedID)
     }
 
     class ImageGroupRequest {
