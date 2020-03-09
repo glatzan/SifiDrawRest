@@ -127,6 +127,6 @@ class ImageService @Autowired constructor(
         if (dbImage.concurrencyCounter + 1 == image.concurrencyCounter)
             return imageRepository.save(image);
         else
-            throw IllegalArgumentException("Concurrency Error")
+            throw IllegalArgumentException("Concurrency Error NEW Image = ${image.concurrencyCounter}; old Image ${dbImage.concurrencyCounter}")
     }
 }
