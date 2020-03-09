@@ -34,15 +34,14 @@ class ImageController @Autowired constructor(
 
     @PutMapping("/image/update")
     fun updateImageData(@RequestBody image: Image): Image {
-        println("put")
-        return imageRepository.save(image)
+        return imageService.updateImage(image)
     }
 
     @PutMapping("/image/update/checked")
     fun updateAndCheckImageData(@RequestBody image: Image): Image {
         return if (imageService.imageExist(image.id)) {
             println("image ok update" + image.name)
-            imageRepository.save(image)
+            return imageService.updateImage(image)
         } else {
             val img = Gson().toJson(image)
             println("Image not found!")

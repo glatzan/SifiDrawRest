@@ -77,4 +77,17 @@ class ImageGroupService @Autowired constructor(
 
         }
     }
+
+    fun updateImageGroup(group: ImageGroup): ImageGroup {
+        val dbGroup = imageGroupRepository.findById(group.id).orElseThrow { IllegalAccessException("ImageGroup not found!") };
+
+        val images = group.images.map { imageService.updateImage(it) }
+
+        if (dbGroup.concurrencyCounter + 1 == group.concurrencyCounter) {
+            val savedGroup = imageGroupRepository.save(group);
+            savedGroup.images = images.toMutableList()
+            return savedGroup
+        } else
+            throw IllegalArgumentException("Concurrency Error")
+    }
 }

@@ -120,4 +120,13 @@ class ImageService @Autowired constructor(
         resultList.sortBy { it.name }
         return resultList
     }
+
+    fun updateImage(image: Image) : Image{
+        val dbImage = imageRepository.findById(image.id).orElseThrow { IllegalAccessException("Image not found!") };
+
+        if (dbImage.concurrencyCounter + 1 == image.concurrencyCounter)
+            return imageRepository.save(image);
+        else
+            throw IllegalArgumentException("Concurrency Error")
+    }
 }

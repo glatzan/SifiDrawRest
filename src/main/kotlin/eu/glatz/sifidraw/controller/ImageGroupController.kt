@@ -5,6 +5,7 @@ import eu.glatz.sifidraw.model.ImageGroup
 import eu.glatz.sifidraw.repository.ImageGroupRepository
 import eu.glatz.sifidraw.repository.ImageRepository
 import eu.glatz.sifidraw.service.ImageGroupService
+import eu.glatz.sifidraw.service.ImageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.nio.charset.Charset
@@ -14,6 +15,7 @@ import java.util.*
 @RestController
 class ImageGroupController @Autowired constructor(
         private val imageGroupService: ImageGroupService,
+        private val imageService: ImageService,
         private val imageGroupRepository: ImageGroupRepository,
         private val imageRepository: ImageRepository) {
 
@@ -42,10 +44,7 @@ class ImageGroupController @Autowired constructor(
 
     @PutMapping("/imagegroup/update")
     fun updateImageData(@RequestBody group: ImageGroup): ImageGroup {
-        group.images.forEach {
-            imageRepository.save(it)
-        }
-        return imageGroupRepository.save(group)
+        return imageGroupService.updateImageGroup(group)
     }
 
     @DeleteMapping("/imagegroup/delete/{id}")
