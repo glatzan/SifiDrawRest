@@ -67,6 +67,16 @@ class ImageController @Autowired constructor(
         return ""
     }
 
+    @GetMapping("/image/clone/{id}")
+    fun cloneImage(@PathVariable id: String, @RequestParam("targetDir") targetDir: Optional<String>): Image {
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+        return if (targetDir.isPresent) {
+            imageService.cloneImage(decodedID, String(Base64.getDecoder().decode(targetDir.get()), Charset.forName("UTF-8")))
+        } else {
+            imageService.cloneImage(decodedID)
+        }
+    }
+
     @PostMapping("/image/upload/{path}&{overwrite}")
     fun handlePicture(@RequestParam("file") multipartFile: MultipartFile?, @PathVariable path: String?, @PathVariable overwrite: String?) {
         if (multipartFile != null && !path.isNullOrEmpty() && multipartFile.size != 0L) {

@@ -80,6 +80,45 @@ class ImageService @Autowired constructor(
         return img
     }
 
+    fun cloneImage(imagePath: String, targetFolderPath: String = imagePath.substringBeforeLast("/")) : Image {
+        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+        val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+
+        if (!imageExist(id))
+            throw java.lang.IllegalArgumentException("Image not found")
+
+        val imageName = imagePath.substringAfterLast("/")
+        val targetFolder = File(projectSettings.dir, targetFolderPath)
+
+        if (!targetFolder.isDirectory)
+            throw java.lang.IllegalArgumentException("Target Folder not found!")
+
+        val validFolderPath = (if (targetFolderPath.endsWith("/")) targetFolderPath else "${targetFolderPath}/")
+        var newImageName = imageName
+        var newImagePath = validFolderPath + newImageName
+        var newImageFile = File(projectSettings.dir, newImagePath)
+        var i = 0
+        while (newImageFile.exists()) {
+
+            if (i == 0) {
+                newImageName = imageName.substringBeforeLast(".") + "_Kopie." + imageName.substringAfterLast(".")
+            } else {
+                newImageName = imageName.substringBeforeLast(".") + "_Kopie_${i}." + imageName.substringAfterLast(".")
+            }
+
+            newImagePath = validFolderPath + newImageName
+            newImageFile = File(projectSettings.dir, newImagePath)
+            i++;
+        }
+
+        FileUtils.copyFile(File(projectSettings.dir, imagePath), newImageFile);
+
+        img.name = newImageName.substringBeforeLast(".")
+        img.id = Base64.getEncoder().encodeToString(newImagePath.toByteArray())
+
+        return imageRepository.save(img);
+    }
+
     fun imageExist(imagePath: String): Boolean {
         val id = String(Base64.getDecoder().decode(imagePath), Charset.forName("UTF-8"))
         val imgFile = File(projectSettings.dir, id)
@@ -129,4 +168,6 @@ class ImageService @Autowired constructor(
         else
             throw IllegalArgumentException("Concurrency Error NEW Image = ${image.concurrencyCounter}; old Image ${dbImage.concurrencyCounter}")
     }
+
+
 }

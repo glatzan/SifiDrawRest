@@ -38,6 +38,49 @@ class ImageGroupService @Autowired constructor(
         }
     }
 
+    fun cloneImageGroup(imageGroupPath: String, datasetPath: String? = null): ImageGroup {
+        val id = String(Base64.getEncoder().encodeToString(imageGroupPath.toByteArray()).toByteArray(), Charset.forName("UTF-8"))
+
+        var fixedDatasetPath = datasetPath;
+
+        if (fixedDatasetPath == null)
+            fixedDatasetPath = if(imageGroupPath.endsWith("/")) imageGroupPath.substring(0,imageGroupPath.length-1).substringBeforeLast("/") else  imageGroupPath.substringBeforeLast("/")
+
+
+        if (!groupExist(id))
+            throw java.lang.IllegalArgumentException("Image Group not found!")
+
+        val datasetFolder = File(projectSettings.dir, fixedDatasetPath)
+
+        if (!datasetFolder.isDirectory)
+            throw java.lang.IllegalArgumentException("Target dir not found!")
+
+        val origGroup = imageGroupRepository.findById(id);
+
+        if (!origGroup.isPresent)
+            throw java.lang.IllegalArgumentException("Image Group not found in Database!")
+
+        var newName = origGroup.get().name + "_Kopie"
+        var i = 0
+        while (imageGroupRepository.findByName(newName) != null) {
+            newName = origGroup.get().name + "_Kopie_${i}"
+            i++
+        }
+
+        val newGroup = createImageGroup(fixedDatasetPath, newName);
+        val decodedGroupID = String(Base64.getDecoder().decode(newGroup!!.id), Charset.forName("UTF-8"))
+
+        val images = imageService.getImagesOfFolder(imageGroupPath, false);
+
+        images.forEach {
+            val decodedID = String(Base64.getDecoder().decode(it.id), Charset.forName("UTF-8"))
+            imageService.cloneImage(decodedID, decodedGroupID)
+        }
+
+
+        return getImageGroup(decodedGroupID, false)
+    }
+
     fun addImageToGroup(imageGroup: ImageGroup, image: Image): Image {
         val groupDir = String(Base64.getDecoder().decode(imageGroup.id), Charset.forName("UTF-8"))
         return this.imageService.moveAndAddImageToPath(groupDir, image)
@@ -81,13 +124,18 @@ class ImageGroupService @Autowired constructor(
     fun updateImageGroup(group: ImageGroup): ImageGroup {
         val dbGroup = imageGroupRepository.findById(group.id).orElseThrow { IllegalAccessException("ImageGroup not found!") };
 
-        val images = group.images.map { imageService.updateImage(it) }
+//        val images = group.images.map { imageService.updateImage(it) }
 
         if (dbGroup.concurrencyCounter + 1 == group.concurrencyCounter) {
-            val savedGroup = imageGroupRepository.save(group);
-            savedGroup.images = images.toMutableList()
-            return savedGroup
+            return imageGroupRepository.save(group);
+//            savedGroup.images = images.toMutableList()
         } else
-            throw IllegalArgumentException("Concurrency Error")
+            throw IllegalArgumentException("Concurrency Error NEW group = ${group.concurrencyCounter}; old group ${dbGroup.concurrencyCounter}")
+    }
+
+    fun groupExist(groupPath: String): Boolean {
+        val id = String(Base64.getDecoder().decode(groupPath), Charset.forName("UTF-8"))
+        val imgFile = File(projectSettings.dir, id)
+        return imgFile.isDirectory;
     }
 }

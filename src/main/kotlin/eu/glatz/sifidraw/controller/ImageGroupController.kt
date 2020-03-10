@@ -42,6 +42,18 @@ class ImageGroupController @Autowired constructor(
         return imageGroupService.getImageGroup(decodedID, true, format.orElse("png"))
     }
 
+    @GetMapping("/imagegroup/clone/{id}")
+    fun cloneImageGroup(@PathVariable id: String, @RequestParam("targetDir") targetDir: Optional<String>): ImageGroup {
+        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
+
+        return if (targetDir.isPresent) {
+            imageGroupService.cloneImageGroup(decodedID, String(Base64.getDecoder().decode(targetDir.get()), Charset.forName("UTF-8")))
+        } else {
+            imageGroupService.cloneImageGroup(decodedID)
+        }
+    }
+
+
     @PutMapping("/imagegroup/update")
     fun updateImageData(@RequestBody group: ImageGroup): ImageGroup {
         return imageGroupService.updateImageGroup(group)
