@@ -70,9 +70,14 @@ class ImageService @Autowired constructor(
         val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
 
         if (loadImageData) {
-            val readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
+            var readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
             img.width = readImg.width
             img.height = readImg.height
+
+            // workaround for png to jpg conversion
+            if(imagePath.substringAfterLast(".") != format)
+                readImg = ImageUtil.prepareConvertImage(readImg)
+
             img.data = ImageUtil.imageToBase64(readImg, format)
             img.fileExtension = format
         }

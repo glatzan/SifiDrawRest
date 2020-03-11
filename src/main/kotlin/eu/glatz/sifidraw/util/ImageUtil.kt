@@ -15,13 +15,16 @@ class ImageUtil {
         fun readImageAsBufferedImage(file: File): BufferedImage {
             println(file.absolutePath + " " + file.isFile)
             if (file.isFile) {
-                val tmp = ImageIO.read(file)
-                val imageRGB = BufferedImage(tmp.width,
-                        tmp.height, BufferedImage.TYPE_INT_RGB)
-                imageRGB.createGraphics().drawImage(tmp, null, null);
-                return imageRGB;
+                return ImageIO.read(file)
             }
             throw IOException("Not Image File")
+        }
+
+        fun prepareConvertImage(bufferedImage: BufferedImage): BufferedImage{
+            val imageRGB = BufferedImage(bufferedImage.width,
+                    bufferedImage.height, BufferedImage.TYPE_INT_RGB)
+            imageRGB.createGraphics().drawImage(bufferedImage, null, null);
+            return imageRGB;
         }
 
         @JvmStatic
