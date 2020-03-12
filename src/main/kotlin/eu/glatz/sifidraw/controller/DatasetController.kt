@@ -18,9 +18,9 @@ class DatasetController @Autowired constructor(
         private val projectSettings: ProjectSettings) {
 
     @GetMapping("/dataset/{id}")
-    fun getDataset(@PathVariable id: String): Dataset {
+    fun getDataset(@PathVariable id: String, @RequestParam("minimize") minimize: Optional<Boolean>): Dataset {
         val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        return datasetService.getDataset(decodedID);
+        return datasetService.getDataset(decodedID, minimize.orElse(false));
     }
 
     @GetMapping("/datasets/{datasets}")
@@ -29,7 +29,7 @@ class DatasetController @Autowired constructor(
         val result = ArrayList<Dataset>();
         val arr = decodedDatasets.split("-");
         for (a in arr) {
-            result.add(getDataset(a))
+            result.add(getDataset(a, Optional.of(true)))
         }
 
         return result.toTypedArray();

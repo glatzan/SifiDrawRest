@@ -21,7 +21,7 @@ class DatasetService @Autowired constructor(
         private val imageGroupService: ImageGroupService,
         private val imageRepository: ImageRepository) : AbstractService() {
 
-    public fun getDataset(datasetPath: String): Dataset {
+    public fun getDataset(datasetPath: String, minimize: Boolean): Dataset {
         if ("" == datasetPath)
             throw IllegalArgumentException("");
 
@@ -41,7 +41,7 @@ class DatasetService @Autowired constructor(
             var tmpList = mutableListOf<ImageGroup>()
             for (folder in files) {
                 if (folder.isDirectory) {
-                    tmpList.add(imageGroupService.getImageGroup("${fixedDatasetPath}${folder.name}", false))
+                    tmpList.add(imageGroupService.getImageGroup("${fixedDatasetPath}${folder.name}", false, minimize = minimize))
                 }
             }
 
