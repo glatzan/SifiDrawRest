@@ -102,4 +102,18 @@ class ImageController @Autowired constructor(
             ImageUtil.writeImg(multipartFile.bytes, fileToWrite)
         }
     }
+
+    @GetMapping("/image/rename/{id}")
+    fun renameImage(@PathVariable id: String, @RequestParam("newName") newName: Optional<String>) {
+        if (!newName.isPresent)
+            return;
+
+        val result = imageRepository.findById(id);
+
+        if (result.isPresent) {
+            result.get().name = String(Base64.getDecoder().decode(newName.get()), Charset.forName("UTF-8"))
+            result.get().concurrencyCounter++;
+            imageRepository.save(result.get())
+        }
+    }
 }
