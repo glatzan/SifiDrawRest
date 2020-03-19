@@ -47,17 +47,17 @@ class ImageUtil {
         }
 
         @JvmStatic
-        fun writeBase64Img(imageString: String, file: File) {
-            writeImg(Base64.getDecoder().decode(imageString), file)
+        fun writeBase64Img(imageString: String, file: File, format: String = "png") {
+            writeImg(Base64.getDecoder().decode(imageString), file, format)
         }
 
         @JvmStatic
-        fun writeImg(bytes: ByteArray, file: File) {
+        fun writeImg(bytes: ByteArray, file: File, format: String = "png") {
             try {
                 val bis = ByteArrayInputStream(bytes)
                 val image = ImageIO.read(bis)
                 bis.close()
-                ImageIO.write(image, "png", file)
+                ImageIO.write(image, format, file)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

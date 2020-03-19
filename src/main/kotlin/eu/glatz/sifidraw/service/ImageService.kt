@@ -45,7 +45,14 @@ class ImageService @Autowired constructor(
 
     fun addNewImageToPath(image: Image, type: String): Image {
         var imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
-        imagePath += if (imagePath.endsWith(type)) "" else type
+
+        if (!imagePath.endsWith(type)) {
+            imagePath = if (imagePath.matches(Regex("^.*\\.([a-zA-Z]{3,4})$"))) {
+                "${imagePath.substringBeforeLast(".")}.$type"
+            } else {
+                "${imagePath}.$type"
+            }
+        }
 
         val basePath = imagePath.substringBeforeLast("/") + "/"
         val basePathFile = File(projectSettings.dir, basePath)
@@ -61,7 +68,7 @@ class ImageService @Autowired constructor(
             targetPathFile = File(projectSettings.dir, newPath);
         }
 
-        ImageUtil.writeBase64Img(image.data, targetPathFile)
+        ImageUtil.writeBase64Img(image.data, targetPathFile, type)
         return imageRepository.save(image)
     }
 
