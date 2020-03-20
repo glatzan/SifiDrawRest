@@ -110,6 +110,12 @@
             <version>2.8.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+            <version>1.52u</version>
+        </dependency>
+
     </dependencies>
 
     <build>

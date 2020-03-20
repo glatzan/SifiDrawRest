@@ -20,7 +20,7 @@ class ImageJController @Autowired constructor(
 
         val file = ImageUtil.writeUniqueBase64Img(imageJService.dir, imageJService.file, image)
 
-        val result = imageJService.runImageJReturnJson(file, File("D:/Projekte/sididraw/tmp/lines.ijm"));
+        val result = imageJService.runImageJReturnJson(file, File("D:/Projekte/sifidraw/tmp/lines.ijm"));
 
         return result
     }
