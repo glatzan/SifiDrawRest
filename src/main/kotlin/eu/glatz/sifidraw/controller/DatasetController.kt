@@ -12,7 +12,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @CrossOrigin
-@RestController
+@RequestMapping("SifiDrawRest")
 class DatasetController @Autowired constructor(
         private val datasetService: DatasetService,
         private val projectSettings: ProjectSettings) {

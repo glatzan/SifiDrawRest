@@ -20,6 +20,10 @@ import javax.servlet.http.HttpServletResponse
 class JWTAuthenticationFilter constructor(
         private val authManager: AuthenticationManager) : UsernamePasswordAuthenticationFilter() {
 
+    init {
+        this.setFilterProcessesUrl(SecurityConstants.SIGN_IN)
+    }
+
     @Throws(AuthenticationServiceException::class)
     override fun attemptAuthentication(req: HttpServletRequest,
                                        res: HttpServletResponse): Authentication {

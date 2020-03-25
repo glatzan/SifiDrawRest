@@ -11,7 +11,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 @CrossOrigin
-@RestController
+@RequestMapping("SifiDrawRest")
 class ImageJController @Autowired constructor(
         private val imageJService: ImageJService) {
 

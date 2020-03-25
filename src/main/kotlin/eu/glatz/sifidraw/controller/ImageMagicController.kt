@@ -9,7 +9,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 @CrossOrigin
-@RestController
+@RequestMapping("SifiDrawRest")
 class ImageMagicController @Autowired constructor(
         private val imageMagicService: ImageMagicService) {
 

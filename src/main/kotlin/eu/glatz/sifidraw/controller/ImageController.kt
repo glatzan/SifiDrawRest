@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.IOException
+import java.lang.IllegalArgumentException
 import java.nio.charset.Charset
 import java.util.*
 
 
 @CrossOrigin
-@RestController
+@RequestMapping("SifiDrawRest")
 class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
         private val imageService: ImageService,
@@ -50,13 +51,12 @@ class ImageController @Autowired constructor(
     }
 
     @PostMapping("/image/{type}")
-    fun createImageData(@RequestBody image: Image, @PathVariable type: String): String {
+    fun createImageData(@RequestBody image: Image, @PathVariable type: String){
 
         if (!type.matches(Regex("jpg|png|tif|bmp")))
-            return "Please provide Type";
+            throw IllegalArgumentException("Please provide Type")
 
         imageService.addNewImageToPath(image, type)
-        return "OK";
     }
 
 

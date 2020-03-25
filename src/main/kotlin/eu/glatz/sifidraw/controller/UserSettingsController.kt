@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin
-@RestController
+@RequestMapping("SifiDrawRest")
 class UserSettingsController @Autowired constructor(
         private val userSettingsRepository: UserSettingsRepository) {
 

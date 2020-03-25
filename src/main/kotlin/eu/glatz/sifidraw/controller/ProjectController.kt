@@ -12,7 +12,7 @@ import java.util.*
 
 
 @CrossOrigin
-@RestController
+@RequestMapping("SifiDrawRest")
 class ProjectController @Autowired constructor(private val projectService: ProjectService) {
 
     @RequestMapping("/projects")

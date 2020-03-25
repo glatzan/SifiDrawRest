@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-@RequestMapping()
+@RequestMapping("SifiDrawRest")
 class AuthController @Autowired constructor(
         private val userRepository: UserRepository,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder) {
