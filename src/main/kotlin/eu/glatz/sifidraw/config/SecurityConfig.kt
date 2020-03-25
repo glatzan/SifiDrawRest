@@ -25,11 +25,8 @@ class SecurityConfig @Autowired constructor(
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.cors()
-                .and()
-                .csrf().disable().authorizeRequests()
+        http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
-                .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_IN).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(JWTAuthenticationFilter(authenticationManager()))
@@ -65,4 +62,5 @@ class SecurityConfig @Autowired constructor(
     fun bCryptPasswordEncoder(): BCryptPasswordEncoder? {
         return BCryptPasswordEncoder()
     }
+
 }

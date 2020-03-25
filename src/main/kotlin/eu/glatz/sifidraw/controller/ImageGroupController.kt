@@ -12,6 +12,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 @CrossOrigin
+@RestController
 @RequestMapping("SifiDrawRest")
 class ImageGroupController @Autowired constructor(
         private val imageGroupService: ImageGroupService,

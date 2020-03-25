@@ -16,6 +16,7 @@ import java.util.*
 
 
 @CrossOrigin
+@RestController
 @RequestMapping("SifiDrawRest")
 class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
