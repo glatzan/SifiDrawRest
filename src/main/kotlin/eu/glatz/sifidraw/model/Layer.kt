@@ -10,4 +10,6 @@ class Layer {
     var color: String = "#ffffff"
 
     var type: Int = 1
+
+    var interpolationPointDistance: Int = if(type == 0) 0 else 10
 }
