@@ -2,7 +2,7 @@ package eu.glatz.sifidraw.config
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import org.springframework.beans.factory.annotation.Autowired
+import eu.glatz.sifidraw.repository.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletResponse
 
 
 class JWTAuthorizationFilter constructor(
-        authenticationManager: AuthenticationManager) : BasicAuthenticationFilter(authenticationManager) {
+        authenticationManager: AuthenticationManager,
+        private val userRepository: UserRepository) : BasicAuthenticationFilter(authenticationManager) {
 
 
     @Throws(IOException::class, ServletException::class)
@@ -34,11 +35,16 @@ class JWTAuthorizationFilter constructor(
     private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
         val token = request.getHeader(SecurityConstants.HEADER_STRING)
         if (token != null) { // parse the token.
-            val user: String? = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET.toByteArray()))
+            val user = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET.toByteArray()))
                     .build()
                     .verify(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
-                    .subject
-            return if (user != null) {
+
+            val userName = user.subject ?: return null
+            val uniqueToken = user.claims["token"]?.asString() ?: return null
+
+            val dbUser = userRepository.findByName(userName) ?: return null
+
+            return if (dbUser.valToken == uniqueToken) {
                 UsernamePasswordAuthenticationToken(user, null, ArrayList())
             } else null
         }

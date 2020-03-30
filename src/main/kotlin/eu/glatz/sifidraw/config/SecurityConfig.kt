@@ -1,9 +1,9 @@
 package eu.glatz.sifidraw.config
 
+import eu.glatz.sifidraw.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
-import org.springframework.ldap.core.support.LdapContextSource
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -18,7 +18,8 @@ import java.util.*
 
 @EnableWebSecurity
 class SecurityConfig @Autowired constructor(
-        private val ldapDatabaseAuthenticationProvider: LDAPDatabaseAuthenticationProvider) : WebSecurityConfigurerAdapter() {
+        private val ldapDatabaseAuthenticationProvider: LDAPDatabaseAuthenticationProvider,
+        private val userRepository: UserRepository) : WebSecurityConfigurerAdapter() {
 
     // https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
 
@@ -29,7 +30,7 @@ class SecurityConfig @Autowired constructor(
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(JWTAuthorizationFilter(authenticationManager())) // this disables session creation on Spring Security
+                .addFilter(JWTAuthorizationFilter(authenticationManager(),userRepository)) // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 

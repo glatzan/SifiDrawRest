@@ -25,20 +25,22 @@ class LDAPDatabaseAuthenticationProvider @Autowired constructor(
         val name: String = authentication.name
         val password: String = authentication.credentials.toString()
 
-
         val applicationUser: User? = userRepository.findByName(name)
 
-
         if (applicationUser != null && applicationUser.localUser) {
-            return if (bCryptPasswordEncoder.matches(password,applicationUser.password))
+            return if (bCryptPasswordEncoder.matches(password, applicationUser.password)) {
+                applicationUser.valToken = UUID.randomUUID().toString()
+                userRepository.save(applicationUser)
                 UsernamePasswordAuthenticationToken(
-                        name, bCryptPasswordEncoder.encode(password), ArrayList())
-            else
+                        applicationUser, bCryptPasswordEncoder.encode(password), ArrayList())
+            } else
                 null
         } else if (applicationUser != null) {
             return if (ldapService.authenticate(name, password)) {
+                applicationUser.valToken = UUID.randomUUID().toString()
+                userRepository.save(applicationUser)
                 UsernamePasswordAuthenticationToken(
-                        name, bCryptPasswordEncoder.encode(password), ArrayList())
+                        applicationUser, bCryptPasswordEncoder.encode(password), ArrayList())
             } else {
                 null
             }
@@ -47,10 +49,11 @@ class LDAPDatabaseAuthenticationProvider @Autowired constructor(
                 val user = User();
                 user.name = name
                 user.localUser = false
+                user.valToken = UUID.randomUUID().toString()
                 userRepository.save(user)
 
                 return UsernamePasswordAuthenticationToken(
-                        name, bCryptPasswordEncoder.encode(password), ArrayList())
+                        user, bCryptPasswordEncoder.encode(password), ArrayList())
             }
         }
 
