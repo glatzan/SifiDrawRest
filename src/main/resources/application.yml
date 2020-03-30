@@ -23,3 +23,9 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+ldap:
+  url: ldap://ldap.ukl.uni-freiburg.de/
+  baseDn: dc=ukl,dc=uni-freiburg,dc=de
+  peopleDn: ou=people,dc=ukl,dc=uni-freiburg,dc=de
+  personDn: uid

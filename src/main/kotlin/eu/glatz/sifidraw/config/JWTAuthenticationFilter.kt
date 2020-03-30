@@ -47,7 +47,7 @@ class JWTAuthenticationFilter constructor(
                                           chain: FilterChain?,
                                           auth: Authentication) {
         val token: String = JWT.create()
-                .withSubject((auth.principal as org.springframework.security.core.userdetails.User).username)
+                .withSubject(auth.principal as String)
                 .withExpiresAt(Date(System.currentTimeMillis() + eu.glatz.sifidraw.config.SecurityConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(eu.glatz.sifidraw.config.SecurityConstants.SECRET.toByteArray()))
         res.status = HttpServletResponse.SC_OK

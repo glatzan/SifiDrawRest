@@ -1,15 +1,14 @@
 package eu.glatz.sifidraw.config
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
+import org.springframework.ldap.core.support.LdapContextSource
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -19,7 +18,7 @@ import java.util.*
 
 @EnableWebSecurity
 class SecurityConfig @Autowired constructor(
-        @Qualifier("userDetailsServiceImpl") private val userDetailsService: UserDetailsService) : WebSecurityConfigurerAdapter() {
+        private val ldapDatabaseAuthenticationProvider: LDAPDatabaseAuthenticationProvider) : WebSecurityConfigurerAdapter() {
 
     // https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
 
@@ -36,15 +35,8 @@ class SecurityConfig @Autowired constructor(
 
     @Throws(Exception::class)
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder())
+        auth.authenticationProvider(ldapDatabaseAuthenticationProvider)
     }
-
-//    @Bean
-//    fun corsConfigurationSource(): CorsConfigurationSource? {
-//        val source = UrlBasedCorsConfigurationSource()
-//        source.registerCorsConfiguration("/**", CorsConfiguration().applyPermitDefaultValues())
-//        return source
-//    }
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
