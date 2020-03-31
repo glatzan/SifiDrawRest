@@ -3,6 +3,7 @@ package eu.glatz.sifidraw.config
 import eu.glatz.sifidraw.model.User
 import eu.glatz.sifidraw.repository.UserRepository
 import eu.glatz.sifidraw.service.LDAPService
+import eu.glatz.sifidraw.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationProvider
@@ -16,6 +17,7 @@ import java.util.*
 
 @Component
 class LDAPDatabaseAuthenticationProvider @Autowired constructor(
+        private val userService: UserService,
         private val userRepository: UserRepository,
         private val ldapService: LDAPService,
         @Lazy private val bCryptPasswordEncoder: BCryptPasswordEncoder) : AuthenticationProvider {
@@ -50,7 +52,7 @@ class LDAPDatabaseAuthenticationProvider @Autowired constructor(
                 user.name = name
                 user.localUser = false
                 user.valToken = UUID.randomUUID().toString()
-                userRepository.save(user)
+                userService.createNewUser(user)
 
                 return UsernamePasswordAuthenticationToken(
                         user, bCryptPasswordEncoder.encode(password), ArrayList())
