@@ -44,7 +44,7 @@ class JWTAuthorizationFilter constructor(
 
             val dbUser = userRepository.findByName(userName) ?: return null
 
-            return if (dbUser.valToken == uniqueToken) {
+            return if (dbUser != null) {
                 UsernamePasswordAuthenticationToken(user, null, ArrayList())
             } else null
         }
