@@ -4,6 +4,7 @@ import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.repository.ImageGroupRepository
 import eu.glatz.sifidraw.repository.ImageRepository
+import eu.glatz.sifidraw.util.ImageSorter
 import eu.glatz.sifidraw.util.ImageUtil
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -168,7 +169,7 @@ class ImageService @Autowired constructor(
             resultList.add(getImage("${folderPath}$img", loadImageData, format))
         }
 
-        resultList.sortBy { it.name }
+        resultList.sortWith(ImageSorter)
         return resultList
     }
 
@@ -176,7 +177,7 @@ class ImageService @Autowired constructor(
         val dbImage = imageRepository.findById(image.id)
 
         if (dbImage.isPresent) {
-            if (dbImage.get().concurrencyCounter + 1 == image.concurrencyCounter)
+            if (dbImage.get().concurrencyCounter < image.concurrencyCounter)
                 return imageRepository.save(image);
             else
                 throw IllegalArgumentException("Concurrency Error NEW Image = ${image.concurrencyCounter}; old Image ${dbImage.get().concurrencyCounter}")
