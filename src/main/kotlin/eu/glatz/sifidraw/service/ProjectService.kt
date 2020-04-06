@@ -3,6 +3,7 @@ package eu.glatz.sifidraw.service
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Dataset
 import eu.glatz.sifidraw.model.ProjectData
+import eu.glatz.sifidraw.model.SProject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
@@ -11,6 +12,7 @@ import java.util.*
 
 @Service
 class ProjectService @Autowired constructor(
+        private val sequenceGeneratorService: SequenceGeneratorService,
         private val projectSettings: ProjectSettings) : AbstractService() {
 
     public fun getProjectData(): List<ProjectData> {
@@ -32,4 +34,6 @@ class ProjectService @Autowired constructor(
         val newProject = File(base, dir);
         newProject.mkdirs();
     }
+
+
 }

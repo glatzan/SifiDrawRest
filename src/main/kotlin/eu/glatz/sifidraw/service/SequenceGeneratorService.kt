@@ -1,6 +1,7 @@
 package eu.glatz.sifidraw.service
 
 import eu.glatz.sifidraw.model.DatabaseSequence
+import eu.glatz.sifidraw.model.SProject
 import eu.glatz.sifidraw.repository.DatabaseSequenceRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -25,5 +26,9 @@ class SequenceGeneratorService @Autowired constructor(
             databaseSequenceRepository.save(nseq)
             0
         }
+    }
+
+    fun generateHexSequence(seqName: String): String {
+        return generateSequence(SProject.SEQUENCE_NAME).toUInt().toString(16).padStart(24, '0')
     }
 }

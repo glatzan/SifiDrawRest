@@ -77,6 +77,8 @@ class ImageService @Autowired constructor(
         val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
         val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
 
+        img.hasLayerData = !img.layers.isEmpty()
+
         if (loadImageData) {
             var readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
             img.width = readImg.width
