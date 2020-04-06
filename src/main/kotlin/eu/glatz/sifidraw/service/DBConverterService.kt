@@ -30,7 +30,7 @@ class DBConverterService @Autowired constructor(
                 println("Project: ${projectFile.name}")
                 val project = SProject()
                 project.name = projectFile.name
-                project.path = "${projectFile.path.replace("\\","/")}/"
+                project.path = "${projectFile.name}/"
 
                 // datasets
                 val datasetFiles = projectFile.listFiles()

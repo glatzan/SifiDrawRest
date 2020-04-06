@@ -1,27 +1,38 @@
 package eu.glatz.sifidraw.service
 
 import eu.glatz.sifidraw.config.ProjectSettings
+import eu.glatz.sifidraw.model.SAImage
 import eu.glatz.sifidraw.model.SDataset
+import eu.glatz.sifidraw.repository.SAImageRepository
 import eu.glatz.sifidraw.repository.SDatasetRepository
-import org.bson.types.ObjectId
+import eu.glatz.sifidraw.repository.SProjectRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
 
 @Service
 class SDatasetService @Autowired constructor(
-        private val sequenceGeneratorService: SequenceGeneratorService,
+        private val sProjectRepository: SProjectRepository,
         private val projectSettings: ProjectSettings,
-        private val datasetRepository: SDatasetRepository) : AbstractService() {
+        private val saImageService: SAImageService,
+        private val saImageRepository: SAImageRepository,
+        private val sDatasetRepository: SDatasetRepository) : AbstractFileService() {
 
-    fun createDataset(name: String, path: String): SDataset {
-        val baseDir = File(projectSettings.dir)
+    fun createDataset(name: String, projectID: String): SDataset {
+        val project = sProjectRepository.findById(projectID).orElseThrow { IllegalArgumentException("Project not found!") }
 
         val newDataset = SDataset()
         newDataset.name = name
-        newDataset.path = path
+        val datasetFile = getUniqueFile(File(projectSettings.dir, project.path), name)
+        newDataset.path = "${project.path}${datasetFile.name}/"
 
-        return datasetRepository.save(newDataset)
+        return sDatasetRepository.save(newDataset)
+    }
+
+    fun addImageToDataset(datasetID: String, imageID: String): SAImage {
+        val dataset = sDatasetRepository.findById(datasetID).orElseThrow { IllegalArgumentException("Dataset not found") }
+        val image = saImageRepository.findById(imageID).orElseThrow { IllegalArgumentException("Image not found") }
+        return saImageService.moveImageToDataset(image, dataset)
     }
 
 }

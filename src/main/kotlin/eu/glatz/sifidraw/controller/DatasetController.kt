@@ -1,58 +1,46 @@
 package eu.glatz.sifidraw.controller
 
-import eu.glatz.sifidraw.config.ProjectSettings
-import eu.glatz.sifidraw.model.Dataset
-import eu.glatz.sifidraw.model.Image
-import eu.glatz.sifidraw.service.DatasetService
+import com.fasterxml.jackson.annotation.JsonView
+import eu.glatz.sifidraw.model.SAImage
+import eu.glatz.sifidraw.model.SDataset
+import eu.glatz.sifidraw.repository.SDatasetRepository
+import eu.glatz.sifidraw.service.SDatasetService
+import eu.glatz.sifidraw.util.JsonViews
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import java.io.File
 import java.nio.charset.Charset
 import java.util.*
-import kotlin.collections.ArrayList
 
 @CrossOrigin
 @RestController
 @RequestMapping("SifiDrawRest")
 class DatasetController @Autowired constructor(
-        private val datasetService: DatasetService,
-        private val projectSettings: ProjectSettings) {
+        private val sDatasetService: SDatasetService,
+        private val sDatasetRepository: SDatasetRepository) {
 
+    @JsonView(JsonViews.OnlyDatasetData::class)
+    @GetMapping("/dataset/minimize/{id}")
+    fun getMinimizedDataset(@PathVariable id: String): SDataset {
+        return sDatasetRepository.findById(id).orElseThrow()
+    }
+
+    @JsonView(JsonViews.AllDatasetData::class)
     @GetMapping("/dataset/{id}")
-    fun getDataset(@PathVariable id: String, @RequestParam("minimize") minimize: Optional<Boolean>): Dataset {
-        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        return datasetService.getDataset(decodedID, minimize.orElse(false));
+    fun getDataset(@PathVariable id: String): SDataset {
+        return sDatasetRepository.findById(id).orElseThrow()
     }
 
-    @GetMapping("/datasets/{datasets}")
-    fun getDatasets(@PathVariable datasets: String): Array<Dataset> {
-        val decodedDatasets = String(Base64.getDecoder().decode(datasets), Charset.forName("UTF-8"))
-        val result = ArrayList<Dataset>();
-        val arr = decodedDatasets.split("-");
-        for (a in arr) {
-            result.add(getDataset(a, Optional.of(true)))
-        }
-
-        return result.toTypedArray();
+    @GetMapping("/dataset/new")
+    fun createDataset(@RequestParam("name") base64Name: Optional<String>, @RequestParam("projectID") projectID: Optional<String>): SDataset {
+        val datasetName = String(Base64.getDecoder().decode(base64Name.orElseThrow { IllegalArgumentException("Name must be provided") }.toByteArray()), Charset.forName("UTF-8"))
+        return sDatasetService.createDataset(datasetName, projectID.orElse(""))
     }
 
-    @PostMapping("/dataset/new/{id}")
-    fun createDataset(@PathVariable id: String): Boolean {
-        val f = File(projectSettings.dir, String(Base64.getDecoder().decode(id), Charset.forName("UTF-8")))
-        println("creating dir ${f.absolutePath}")
-        return f.mkdir();
-    }
-
-    @PostMapping("/dataset/addImage")
-    fun addImageToDataset(@RequestBody request: ImageAddRequest?) {
-        if (request == null)
-            throw IllegalArgumentException("Arguments not valid")
-
-        datasetService.addImageToDataset(request.dataset, request.image)
-    }
-
-    class ImageAddRequest {
-        lateinit var image: Image
-        lateinit var dataset: Dataset
+    /**
+     * addImageToDataset
+     */
+    @GetMapping("/dataset/addImage")
+    fun moveImageToDataset(@RequestParam("datasetID") datasetID: Optional<String>, @RequestParam("imageID") imageID: Optional<String>): SAImage {
+        return sDatasetService.addImageToDataset(datasetID.orElse(""), imageID.orElse(""))
     }
 }

@@ -3,14 +3,14 @@ package eu.glatz.sifidraw.controller
 import com.google.gson.Gson
 import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.Image
+import eu.glatz.sifidraw.model.SAImage
 import eu.glatz.sifidraw.repository.ImageRepository
 import eu.glatz.sifidraw.service.ImageService
+import eu.glatz.sifidraw.service.SAImageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.io.IOException
-import java.lang.IllegalArgumentException
 import java.nio.charset.Charset
 import java.util.*
 
@@ -21,22 +21,26 @@ import java.util.*
 class ImageController @Autowired constructor(
         private val imageRepository: ImageRepository,
         private val imageService: ImageService,
+        private val saImageService: SAImageService,
         private val projectSettings: ProjectSettings) {
 
-    @GetMapping("/image/{id}")
-    fun getImageData(@PathVariable id: String, @RequestParam("format") format: Optional<String>): Image {
-        val decodedID = String(Base64.getDecoder().decode(id), Charset.forName("UTF-8"))
-        try {
-            return imageService.getImage(decodedID, true, format.orElse("png"))
-        } catch (e: IOException) {
-            return Image("-", "-")
-        }
+    @GetMapping("/image")
+    fun getImageData(@RequestParam("id") id: Optional<String>, @RequestParam("format") format: Optional<String>): SAImage {
+        return saImageService.loadImage(id.orElse(""), true, format.orElse("png"))
     }
 
     @PutMapping("/image/update")
-    fun updateImageData(@RequestBody image: Image): Image {
-        return imageService.updateImage(image)
+    fun updateImageData(@RequestBody image: SAImage): SAImage {
+        return saImageService.saveImage(image)
     }
+
+
+
+
+
+
+
+
 
     @PutMapping("/image/update/checked")
     fun updateAndCheckImageData(@RequestBody image: Image): Image {

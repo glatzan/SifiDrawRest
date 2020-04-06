@@ -175,18 +175,5 @@ class ImageService @Autowired constructor(
         return resultList
     }
 
-    fun updateImage(image: Image) : Image{
-        val dbImage = imageRepository.findById(image.id)
-
-        if (dbImage.isPresent) {
-            if (dbImage.get().concurrencyCounter < image.concurrencyCounter)
-                return imageRepository.save(image);
-            else
-                throw IllegalArgumentException("Concurrency Error NEW Image = ${image.concurrencyCounter}; old Image ${dbImage.get().concurrencyCounter}")
-        } else {
-            return imageRepository.save(image)
-        }
-    }
-
 
 }
