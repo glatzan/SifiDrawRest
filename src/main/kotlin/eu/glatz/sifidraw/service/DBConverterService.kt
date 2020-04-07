@@ -98,7 +98,7 @@ class DBConverterService @Autowired constructor(
             println("       Image: ${imagePath} - db ${dbImage != null}")
 
         var image = SImage()
-        image.name = dbImage?.name ?: imageFile.name
+        image.name = dbImage?.name ?: imageFile.name.substringBeforeLast(".")
         image.path = imagePath
         image.fileExtension = dbImage?.fileExtension ?: ".png"
         image.width = dbImage?.width ?: 0

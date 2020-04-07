@@ -19,120 +19,120 @@ class ImageService @Autowired constructor(
         private val imageGroupRepository: ImageGroupRepository,
         private val imageRepository: ImageRepository) : AbstractService() {
 
-    fun moveAndAddImageToPath(path: String, image: Image): Image {
-        val imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
-        val imgName = imagePath.substringAfterLast("/")
+//    fun moveAndAddImageToPath(path: String, image: Image): Image {
+//        val imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
+//        val imgName = imagePath.substringAfterLast("/")
+//
+//        val validPath = path + (if (!path.endsWith("/")) "/" else "")
+//        var newImageID = validPath + imgName
+//
+//        val imageFile = File(projectSettings.dir, imagePath);
+//        var newImageFile = File(projectSettings.dir, newImageID);
+//
+//        if (newImageFile.exists()) {
+//            val uuid = UUID.randomUUID()
+//            val randomUUIDString = uuid.toString()
+//            newImageID = validPath + randomUUIDString + "." + imgName.substringAfterLast(".")
+//            newImageFile = File(projectSettings.dir, newImageID);
+//        }
+//
+//        FileUtils.moveFile(imageFile, newImageFile)
+//
+//        imageRepository.delete(image)
+//
+//        image.id = Base64.getEncoder().encodeToString(newImageID.toByteArray())
+//        return imageRepository.save(image)
+//    }
 
-        val validPath = path + (if (!path.endsWith("/")) "/" else "")
-        var newImageID = validPath + imgName
+//    fun addNewImageToPath(image: Image, type: String): Image {
+//        var imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
+//
+//        if (!imagePath.endsWith(type)) {
+//            imagePath = if (imagePath.matches(Regex("^.*\\.([a-zA-Z]{3,4})$"))) {
+//                "${imagePath.substringBeforeLast(".")}.$type"
+//            } else {
+//                "${imagePath}.$type"
+//            }
+//        }
+//
+//        val basePath = imagePath.substringBeforeLast("/") + "/"
+//        val basePathFile = File(projectSettings.dir, basePath)
+//        if (!basePathFile.exists())
+//            basePathFile.mkdirs()
+//
+//        var targetPathFile = File(projectSettings.dir, imagePath);
+//        if (targetPathFile.exists()) {
+//            val uuid = UUID.randomUUID()
+//            val randomUUIDString = uuid.toString()
+//            val newPath = basePath + randomUUIDString + "." + imagePath.substringAfterLast(".")
+//            image.id = Base64.getEncoder().encodeToString(newPath.toByteArray())
+//            targetPathFile = File(projectSettings.dir, newPath);
+//        }
+//
+//        ImageUtil.writeBase64Img(image.data, targetPathFile, type)
+//        return imageRepository.save(image)
+//    }
 
-        val imageFile = File(projectSettings.dir, imagePath);
-        var newImageFile = File(projectSettings.dir, newImageID);
+//    fun getImage(imagePath: String, loadImageData: Boolean, format: String = "png"): Image {
+//        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+//        val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+//
+//        img.hasLayerData = !img.layers.isEmpty()
+//
+//        if (loadImageData) {
+//            var readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
+//            img.width = readImg.width
+//            img.height = readImg.height
+//
+//            // workaround for png to jpg conversion
+//            if(imagePath.substringAfterLast(".") != format)
+//                readImg = ImageUtil.prepareConvertImage(readImg)
+//
+//            img.data = ImageUtil.imageToBase64(readImg, format)
+//            img.fileExtension = format
+//        }
+//
+//        return img
+//    }
 
-        if (newImageFile.exists()) {
-            val uuid = UUID.randomUUID()
-            val randomUUIDString = uuid.toString()
-            newImageID = validPath + randomUUIDString + "." + imgName.substringAfterLast(".")
-            newImageFile = File(projectSettings.dir, newImageID);
-        }
-
-        FileUtils.moveFile(imageFile, newImageFile)
-
-        imageRepository.delete(image)
-
-        image.id = Base64.getEncoder().encodeToString(newImageID.toByteArray())
-        return imageRepository.save(image)
-    }
-
-    fun addNewImageToPath(image: Image, type: String): Image {
-        var imagePath = String(Base64.getDecoder().decode(image.id), Charset.forName("UTF-8"))
-
-        if (!imagePath.endsWith(type)) {
-            imagePath = if (imagePath.matches(Regex("^.*\\.([a-zA-Z]{3,4})$"))) {
-                "${imagePath.substringBeforeLast(".")}.$type"
-            } else {
-                "${imagePath}.$type"
-            }
-        }
-
-        val basePath = imagePath.substringBeforeLast("/") + "/"
-        val basePathFile = File(projectSettings.dir, basePath)
-        if (!basePathFile.exists())
-            basePathFile.mkdirs()
-
-        var targetPathFile = File(projectSettings.dir, imagePath);
-        if (targetPathFile.exists()) {
-            val uuid = UUID.randomUUID()
-            val randomUUIDString = uuid.toString()
-            val newPath = basePath + randomUUIDString + "." + imagePath.substringAfterLast(".")
-            image.id = Base64.getEncoder().encodeToString(newPath.toByteArray())
-            targetPathFile = File(projectSettings.dir, newPath);
-        }
-
-        ImageUtil.writeBase64Img(image.data, targetPathFile, type)
-        return imageRepository.save(image)
-    }
-
-    fun getImage(imagePath: String, loadImageData: Boolean, format: String = "png"): Image {
-        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
-        val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
-
-        img.hasLayerData = !img.layers.isEmpty()
-
-        if (loadImageData) {
-            var readImg = ImageUtil.readImageAsBufferedImage(File(projectSettings.dir, imagePath))
-            img.width = readImg.width
-            img.height = readImg.height
-
-            // workaround for png to jpg conversion
-            if(imagePath.substringAfterLast(".") != format)
-                readImg = ImageUtil.prepareConvertImage(readImg)
-
-            img.data = ImageUtil.imageToBase64(readImg, format)
-            img.fileExtension = format
-        }
-
-        return img
-    }
-
-    fun cloneImage(imagePath: String, targetFolderPath: String = imagePath.substringBeforeLast("/")) : Image {
-        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
-        val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
-
-        if (!imageExist(id))
-            throw java.lang.IllegalArgumentException("Image not found")
-
-        val imageName = imagePath.substringAfterLast("/")
-        val targetFolder = File(projectSettings.dir, targetFolderPath)
-
-        if (!targetFolder.isDirectory)
-            throw java.lang.IllegalArgumentException("Target Folder not found!")
-
-        val validFolderPath = (if (targetFolderPath.endsWith("/")) targetFolderPath else "${targetFolderPath}/")
-        var newImageName = imageName
-        var newImagePath = validFolderPath + newImageName
-        var newImageFile = File(projectSettings.dir, newImagePath)
-        var i = 0
-        while (newImageFile.exists()) {
-
-            if (i == 0) {
-                newImageName = imageName.substringBeforeLast(".") + "_Kopie." + imageName.substringAfterLast(".")
-            } else {
-                newImageName = imageName.substringBeforeLast(".") + "_Kopie_${i}." + imageName.substringAfterLast(".")
-            }
-
-            newImagePath = validFolderPath + newImageName
-            newImageFile = File(projectSettings.dir, newImagePath)
-            i++;
-        }
-
-        FileUtils.copyFile(File(projectSettings.dir, imagePath), newImageFile);
-
-        img.name = newImageName.substringBeforeLast(".")
-        img.id = Base64.getEncoder().encodeToString(newImagePath.toByteArray())
-
-        return imageRepository.save(img);
-    }
+//    fun cloneImage(imagePath: String, targetFolderPath: String = imagePath.substringBeforeLast("/")) : Image {
+//        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+//        val img = imageRepository.findById(id).orElse(Image(id, imagePath.substringAfterLast("/").substringBeforeLast(".")))
+//
+//        if (!imageExist(id))
+//            throw java.lang.IllegalArgumentException("Image not found")
+//
+//        val imageName = imagePath.substringAfterLast("/")
+//        val targetFolder = File(projectSettings.dir, targetFolderPath)
+//
+//        if (!targetFolder.isDirectory)
+//            throw java.lang.IllegalArgumentException("Target Folder not found!")
+//
+//        val validFolderPath = (if (targetFolderPath.endsWith("/")) targetFolderPath else "${targetFolderPath}/")
+//        var newImageName = imageName
+//        var newImagePath = validFolderPath + newImageName
+//        var newImageFile = File(projectSettings.dir, newImagePath)
+//        var i = 0
+//        while (newImageFile.exists()) {
+//
+//            if (i == 0) {
+//                newImageName = imageName.substringBeforeLast(".") + "_Kopie." + imageName.substringAfterLast(".")
+//            } else {
+//                newImageName = imageName.substringBeforeLast(".") + "_Kopie_${i}." + imageName.substringAfterLast(".")
+//            }
+//
+//            newImagePath = validFolderPath + newImageName
+//            newImageFile = File(projectSettings.dir, newImagePath)
+//            i++;
+//        }
+//
+//        FileUtils.copyFile(File(projectSettings.dir, imagePath), newImageFile);
+//
+//        img.name = newImageName.substringBeforeLast(".")
+//        img.id = Base64.getEncoder().encodeToString(newImagePath.toByteArray())
+//
+//        return imageRepository.save(img);
+//    }
 
     fun imageExist(imagePath: String): Boolean {
         val id = String(Base64.getDecoder().decode(imagePath), Charset.forName("UTF-8"))
@@ -140,17 +140,17 @@ class ImageService @Autowired constructor(
         return imgFile.isFile;
     }
 
-    fun deleteImage(imagePath: String) {
-        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
-        val imgFile = File(projectSettings.dir, imagePath)
-        if (imgFile.isFile) {
-            imgFile.delete();
-            val obj = imageRepository.findById(id);
-            if (!obj.isPresent)
-                return
-            imageRepository.delete(obj.get())
-        }
-    }
+//    fun deleteImage(imagePath: String) {
+//        val id = Base64.getEncoder().encodeToString(imagePath.toByteArray())
+//        val imgFile = File(projectSettings.dir, imagePath)
+//        if (imgFile.isFile) {
+//            imgFile.delete();
+//            val obj = imageRepository.findById(id);
+//            if (!obj.isPresent)
+//                return
+//            imageRepository.delete(obj.get())
+//        }
+//    }
 
     fun getDeleteImagesOfFolder(folderPath: String) {
         val folder = File(projectSettings.dir, folderPath);

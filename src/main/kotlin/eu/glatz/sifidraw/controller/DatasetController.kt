@@ -21,13 +21,13 @@ class DatasetController @Autowired constructor(
     @JsonView(JsonViews.OnlyDatasetData::class)
     @GetMapping("/dataset/minimize/{id}")
     fun getMinimizedDataset(@PathVariable id: String): SDataset {
-        return sDatasetRepository.findById(id).orElseThrow()
+        return sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
     }
 
     @JsonView(JsonViews.AllDatasetData::class)
     @GetMapping("/dataset/{id}")
     fun getDataset(@PathVariable id: String): SDataset {
-        return sDatasetRepository.findById(id).orElseThrow()
+        return sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
     }
 
     @GetMapping("/dataset/new")

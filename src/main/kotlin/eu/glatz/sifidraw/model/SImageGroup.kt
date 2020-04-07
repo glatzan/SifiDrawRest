@@ -6,11 +6,11 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "SImages")
-class SImageGroup : SAImage() {
+class SImageGroup : SAImage(), SIHasImages {
 
     @DBRef
     @JsonView(JsonViews.AllDatasetData::class, JsonViews.OnlyDatasetData::class)
-    public var images = mutableListOf<SAImage>();
+    override var images = mutableListOf<SAImage>();
 
     init {
         type = "group"

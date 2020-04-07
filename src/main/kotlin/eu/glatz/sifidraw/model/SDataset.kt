@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class SDataset : SEntity() {
+class SDataset : SEntity(), SIHasImages {
 
     companion object {
         @Transient
@@ -16,5 +16,5 @@ class SDataset : SEntity() {
 
     @JsonView(JsonViews.AllDatasetData::class, JsonViews.OnlyDatasetData::class)
     @DBRef(lazy = true)
-    var images = mutableListOf<SAImage>()
+    override var images = mutableListOf<SAImage>()
 }
