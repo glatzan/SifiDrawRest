@@ -42,7 +42,7 @@ class InitializingBean @Autowired constructor(
             userService.createNewUser(newUser)
         }
 
-        dbConverterService.sync()
+//        dbConverterService.sync()
 
     }
 
