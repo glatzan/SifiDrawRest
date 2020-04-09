@@ -1,6 +1,7 @@
 package eu.glatz.sifidraw.util
 
 import eu.glatz.sifidraw.model.SAImage
+import eu.glatz.sifidraw.model.SIHasImages
 import java.math.BigInteger
 import java.util.regex.Pattern
 import kotlin.math.min
@@ -34,5 +35,15 @@ object ImageSorter : Comparator<SAImage> {
         // If we reach this, then both strings have equally ordered prefixes, but
         // maybe one string is longer than the other (i.e. has more segments)
         return split1.size - split2.size;
+    }
+
+
+    fun sort(parent: SIHasImages) : SIHasImages {
+        parent.images.sortWith(ImageSorter)
+        for (img in parent.images) {
+            if (img is SIHasImages)
+                sort(img)
+        }
+        return parent
     }
 }

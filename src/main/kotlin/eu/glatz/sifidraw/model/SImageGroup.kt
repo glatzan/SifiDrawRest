@@ -5,7 +5,7 @@ import eu.glatz.sifidraw.util.JsonViews
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "SImages")
+@Document(collection = "SImage")
 class SImageGroup : SAImage(), SIHasImages {
 
     @DBRef

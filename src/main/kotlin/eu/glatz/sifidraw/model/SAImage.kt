@@ -14,7 +14,6 @@ open class SAImage : SEntity() {
         val SEQUENCE_NAME: String = "image_sequence"
     }
 
-    @Transient
     @JsonView(JsonViews.AllDatasetData::class, JsonViews.OnlyDatasetData::class)
     open var type: String = ""
 }

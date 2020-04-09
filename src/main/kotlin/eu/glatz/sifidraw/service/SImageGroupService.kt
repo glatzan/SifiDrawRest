@@ -22,15 +22,15 @@ class SImageGroupService @Autowired constructor(
 
 
     fun loadImageGroup(imageGroupID: String, loadImageData: Boolean, asFormat: String = "png"): SImageGroup {
-        val imageGroup = saImageRepository.findById(imageGroupID).orElseThrow { throw IllegalArgumentException("ImageGroup not found!") }
-        return loadImageGroup(imageGroupID, loadImageData, asFormat)
+        val imageGroup = saImageRepository.findById(imageGroupID).orElseThrow { throw IllegalArgumentException("ImageGroup not found!") } as SImageGroup
+        return loadImageGroup(imageGroup, loadImageData, asFormat)
     }
 
     fun loadImageGroup(imageGroup: SImageGroup, loadImageData: Boolean, asFormat: String = "png"): SImageGroup {
         if (loadImageData) {
             for (img in imageGroup.images) {
                 if (img is SImage)
-                    saImageService.loadImageData(img)
+                    saImageService.loadImageData(img, asFormat)
                 else if (img is SImageGroup)
                     this.loadImageGroup(img, loadImageData, asFormat)
             }
@@ -39,13 +39,12 @@ class SImageGroupService @Autowired constructor(
         return imageGroup
     }
 
-
     fun createImageGroup(name: String, parent: String): Pair<SImageGroup, SIHasImages> {
         return createImageGroup(name, saImageService.findParent(parent))
     }
 
     fun createImageGroup(name: String, parent: SIHasImages): Pair<SImageGroup, SIHasImages> {
-        require(name.isEmpty()) { throw IllegalArgumentException("Provide Image Group Name!") }
+        require(name.isNotEmpty()) { throw IllegalArgumentException("Provide Image Group Name!") }
 
         val imageGroup = SImageGroup()
         imageGroup.name = name
@@ -55,12 +54,12 @@ class SImageGroupService @Autowired constructor(
 
     fun addImageGroupToParent(imageGroupID: String, parentID: String): Pair<SImageGroup, SIHasImages> {
         val parent = saImageService.findParent(parentID)
-        val imageGroup = saImageRepository.findById(imageGroupID).orElseThrow { throw IllegalArgumentException("ImageGroup not found!") }
-        return addImageGroupToParent(imageGroupID, parentID)
+        val imageGroup = saImageRepository.findById(imageGroupID).orElseThrow { throw IllegalArgumentException("ImageGroup not found!") } as SImageGroup
+        return addImageGroupToParent(imageGroup, parent)
     }
 
     fun addImageGroupToParent(imageGroup: SImageGroup, parent: SIHasImages): Pair<SImageGroup, SIHasImages> {
-        require(imageGroup.name.isEmpty()) { IllegalArgumentException("Provide ImageGroup name!") }
+        require(imageGroup.name.isNotEmpty()) { IllegalArgumentException("Provide ImageGroup name!") }
 
         val imageGroupFile = getUniqueFile(File(projectSettings.dir, parent.path), imageGroup.name)
         imageGroupFile.mkdirs()
@@ -68,7 +67,7 @@ class SImageGroupService @Autowired constructor(
         imageGroup.path = "${parent.path}${imageGroupFile.name}/"
         val dbImageGroup = saImageRepository.save(imageGroup)
 
-        parent.images.add(imageGroup)
+        parent.images.add(dbImageGroup)
         val dbParent = saImageService.saveParent(parent)
 
         return Pair(dbImageGroup, dbParent)
@@ -98,7 +97,8 @@ class SImageGroupService @Autowired constructor(
         val imageGroup = saImageRepository.findById(imageGroupID).orElseThrow { throw IllegalArgumentException("ImageGroup not found!") }
         if (imageGroup !is SImageGroup)
             throw IllegalArgumentException("No ImageGroup found!")
-        return cloneImageGroup(imageGroup, saImageService.findParent(targetParentID))
+        val parent = if (targetParentID.isEmpty()) saImageService.findParentByImage(imageGroup) else saImageService.findParent(targetParentID)
+        return cloneImageGroup(imageGroup, parent)
     }
 
     fun cloneImageGroup(imageGroup: SImageGroup, parent: SIHasImages): Pair<SImageGroup, SIHasImages> {

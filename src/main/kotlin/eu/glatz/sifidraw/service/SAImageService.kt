@@ -5,7 +5,6 @@ import eu.glatz.sifidraw.model.*
 import eu.glatz.sifidraw.repository.SAImageRepository
 import eu.glatz.sifidraw.repository.SDatasetRepository
 import eu.glatz.sifidraw.util.ImageUtil
-import org.apache.commons.io.FileUtils
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -21,7 +20,7 @@ class SAImageService @Autowired constructor(
         private val saImageRepository: SAImageRepository,
         private val imageRepository: SAImageRepository) : AbstractFileService() {
 
-    fun loadImage(imageID: String, loadImageData: Boolean = true, asFormat: String = "png"): SAImage {
+    fun loadImage(imageID: String, loadImageData: Boolean = true, asFormat: String = "png"): SImage {
         val image = saImageRepository.findById(imageID).orElseThrow { throw IllegalArgumentException("Image not found!") }
 
         if (image !is SImage)
@@ -73,10 +72,14 @@ class SAImageService @Autowired constructor(
     }
 
     fun deleteImage(image: SAImage, removeFromParent: Boolean = true) {
-        saImageRepository.delete(image)
-        FileUtils.forceDelete(File(projectSettings.dir, image.path))
+        if (image !is SImage)
+            throw IllegalArgumentException("Not an image!")
+
         if (removeFromParent)
             removeImageFromParent(image)
+
+        saImageRepository.delete(image)
+        File(projectSettings.dir, image.path).delete()
     }
 
     fun moveImageToParent(imageID: String, parentID: String): Pair<SImage, SIHasImages> {
@@ -92,22 +95,23 @@ class SAImageService @Autowired constructor(
         return addImageToParentLoaded(image, parent)
     }
 
-    fun updateImage(image: SAImage): SAImage {
+    fun updateImage(image: SImage): SAImage {
         val dbImage: SAImage? = saImageRepository.findById(image.id
                 ?: "").orElseThrow { throw IllegalArgumentException("Image not found in db") }
 
-        if (image.concurrencyCounter > dbImage!!.concurrencyCounter)
+        if (image.concurrencyCounter > dbImage!!.concurrencyCounter) {
+            if (image.layers.isNotEmpty())
+                image.hasLayerData = true
+
             return saImageRepository.save(image);
-        else
+        } else
             throw IllegalArgumentException("Concurrency Error: new image = ${image.concurrencyCounter}; old image ${dbImage.concurrencyCounter}")
     }
 
-    fun cloneImage(image: String, parentID: String): Pair<SImage, SIHasImages> {
-        return cloneImage(image, findParent(parentID))
-    }
-
-    fun cloneImage(imageID: String, newParent: SIHasImages): Pair<SImage, SIHasImages> {
-        return cloneImage(loadImage(imageID, true) as SImage, newParent)
+    fun cloneImage(imageID: String, parentID: String): Pair<SImage, SIHasImages> {
+        val image = loadImage(imageID, true)
+        val parent = if (parentID.isEmpty()) findParentByImage(image) else findParent(parentID)
+        return cloneImage(image, parent)
     }
 
     fun cloneImage(image: SImage, newParent: SIHasImages): Pair<SImage, SIHasImages> {
@@ -159,7 +163,7 @@ class SAImageService @Autowired constructor(
     /**
      * Returns a dataset or imagegroup
      */
-    private fun findParentByImage(image: SAImage): SIHasImages {
+    fun findParentByImage(image: SAImage): SIHasImages {
         val dataset = sDatasetRepository.findByImageID(ObjectId(image.id))
 
         if (dataset.isPresent)

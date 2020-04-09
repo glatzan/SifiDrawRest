@@ -17,6 +17,9 @@ class SProjectService @Autowired constructor(
         val newProject = SProject()
         newProject.name = name
 
+        if (!name.matches(Regex("\\w*")))
+            throw IllegalArgumentException("Illegal name $name")
+
         val projectFile = getUniqueFile(File(projectSettings.dir), name)
         projectFile.mkdirs()
         newProject.path = "${projectFile.name}/"

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView
 import eu.glatz.sifidraw.model.SDataset
 import eu.glatz.sifidraw.repository.SDatasetRepository
 import eu.glatz.sifidraw.service.SDatasetService
+import eu.glatz.sifidraw.util.ImageSorter
 import eu.glatz.sifidraw.util.JsonViews
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -18,15 +19,17 @@ class DatasetController @Autowired constructor(
         private val sDatasetRepository: SDatasetRepository) {
 
     @JsonView(JsonViews.OnlyDatasetData::class)
-    @GetMapping("/dataset/minimize/{id}")
+    @GetMapping("/dataset/minimized/{id}")
     fun getMinimizedDataset(@PathVariable id: String): SDataset {
-        return sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
+        val dataset = sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
+        return ImageSorter.sort(dataset) as SDataset
     }
 
     @JsonView(JsonViews.AllDatasetData::class)
     @GetMapping("/dataset/{id}")
     fun getDataset(@PathVariable id: String): SDataset {
-        return sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
+        val dataset = sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
+        return ImageSorter.sort(dataset) as SDataset
     }
 
     @GetMapping("/dataset/create/{name}")

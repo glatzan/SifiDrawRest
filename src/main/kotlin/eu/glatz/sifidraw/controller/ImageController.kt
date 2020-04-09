@@ -24,23 +24,22 @@ class ImageController @Autowired constructor(
     }
 
     @PutMapping("/image/update")
-    fun updateImage(@RequestBody image: SAImage): SAImage {
+    fun updateImage(@RequestBody image: SImage): SAImage {
         return saImageService.updateImage(image)
     }
 
-//     @PostMapping("/imagegroup/addImage")
-    @PostMapping("/image/addToParent")
-    fun addImageToGroup(@RequestBody image: SImage, @RequestParam("parentID") parentID: Optional<String>) {
-        require(parentID.isPresent) { throw  IllegalArgumentException("Arguments not valid") }
-        saImageService.addImageToParentLoaded(image, parentID.get())
-    }
-
+    //     @PostMapping("/imagegroup/addImage")
     //     @PostMapping("/image/{type}")
-    @PostMapping("/image/addToDataset/{parentID}")
+    @PostMapping("/image/addToParent/{parentID}")
     fun addImageToParent(@RequestBody image: SImage, @PathVariable parentID: String, @RequestParam("format") format: Optional<String>) {
         if (format.isPresent && !format.get().matches(Regex("jpg|png|tif|bmp")))
             throw IllegalArgumentException("Please provide a valid type")
         saImageService.addImageToParentLoaded(image, parentID, format.orElse("png"))
+    }
+
+    @GetMapping("/image/moveToParent/{imageID}")
+    fun moveImageToParent(@PathVariable imageID: String, @RequestParam("parentID") parentID : Optional<String>): SImage {
+        return saImageService.moveImageToParent(imageID, parentID.orElse("")).first
     }
 
     @DeleteMapping("/image/delete/{id}")
@@ -57,7 +56,6 @@ class ImageController @Autowired constructor(
     fun renameImage(@PathVariable id: String, @RequestParam("newName") newName: Optional<String>): SAImage {
         val result = saImageRepository.findById(id).orElseThrow { IllegalArgumentException("Image not found!") }
         result.name = String(Base64.getDecoder().decode(newName.orElseThrow { IllegalArgumentException("Entity not found!") }), Charset.forName("UTF-8"))
-        result.concurrencyCounter++;
         return saImageRepository.save(result)
     }
 

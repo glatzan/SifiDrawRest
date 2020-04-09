@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView
 import eu.glatz.sifidraw.model.SImageGroup
 import eu.glatz.sifidraw.repository.SAImageRepository
 import eu.glatz.sifidraw.service.SImageGroupService
+import eu.glatz.sifidraw.util.ImageSorter
 import eu.glatz.sifidraw.util.JsonViews
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -17,7 +18,7 @@ class ImageGroupController @Autowired constructor(
         private val sImageGroupService: SImageGroupService,
         private val saImageRepository: SAImageRepository) {
 
-    @PostMapping("/imagegroup/create/{name}")
+    @GetMapping("/imagegroup/create/{name}")
     fun createImageGroup(@PathVariable name: String, @RequestParam("parentID") parentID: Optional<String>): SImageGroup {
         val decodedName = String(Base64.getDecoder().decode(name), Charset.forName("UTF-8"))
         if (name.isEmpty() || !parentID.isPresent)
@@ -26,14 +27,16 @@ class ImageGroupController @Autowired constructor(
     }
 
     @JsonView(JsonViews.OnlyDatasetData::class)
-    @GetMapping("/imagegroup/minimize/{id}")
+    @GetMapping("/imagegroup/minimized/{id}")
     fun getMinimizedImageGroup(@PathVariable id: String, @RequestParam("format") format: Optional<String>): SImageGroup {
-        return saImageRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") } as SImageGroup
+        val imgGroup = saImageRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") } as SImageGroup
+        return ImageSorter.sort(imgGroup) as SImageGroup
     }
 
     @GetMapping("/imagegroup/{id}")
     fun getImageGroup(@PathVariable id: String, @RequestParam("format") format: Optional<String>): SImageGroup {
-        return sImageGroupService.loadImageGroup(id, true)
+        val imgGroup = sImageGroupService.loadImageGroup(id, true, format.orElse("png"))
+        return ImageSorter.sort(imgGroup) as SImageGroup
     }
 
     @GetMapping("/imagegroup/clone/{id}")
