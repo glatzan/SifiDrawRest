@@ -28,20 +28,19 @@ class ImageController @Autowired constructor(
         return saImageService.updateImage(image)
     }
 
-    //     @PostMapping("/image/{type}")
-    @PostMapping("/image/addToDataset/{datasetID}")
-    fun createImageInDataset(@RequestBody image: SImage, @PathVariable datasetID: String, @RequestParam("format") format: Optional<String>) {
-        if (format.isPresent && !format.get().matches(Regex("jpg|png|tif|bmp")))
-            throw IllegalArgumentException("Please provide a valid type")
-        saImageService.addImageToDataset(image, datasetID, format.orElse("png"))
+//     @PostMapping("/imagegroup/addImage")
+    @PostMapping("/image/addToParent")
+    fun addImageToGroup(@RequestBody image: SImage, @RequestParam("parentID") parentID: Optional<String>) {
+        require(parentID.isPresent) { throw  IllegalArgumentException("Arguments not valid") }
+        saImageService.addImageToParentLoaded(image, parentID.get())
     }
 
     //     @PostMapping("/image/{type}")
-    @PostMapping("/image/addToImageGroup/{imageGroupID}")
-    fun createImageInImageGroup(@RequestBody image: SImage, @PathVariable imageGroupID: String, @RequestParam("format") format: Optional<String>) {
+    @PostMapping("/image/addToDataset/{parentID}")
+    fun addImageToParent(@RequestBody image: SImage, @PathVariable parentID: String, @RequestParam("format") format: Optional<String>) {
         if (format.isPresent && !format.get().matches(Regex("jpg|png|tif|bmp")))
             throw IllegalArgumentException("Please provide a valid type")
-        saImageService.addImageToImageGroup(image, imageGroupID, format.orElse("png"))
+        saImageService.addImageToParentLoaded(image, parentID, format.orElse("png"))
     }
 
     @DeleteMapping("/image/delete/{id}")
@@ -49,9 +48,9 @@ class ImageController @Autowired constructor(
         saImageService.deleteImage(id)
     }
 
-    @GetMapping("/image/cloneToDataset/{id}")
-    fun cloneImageToDataset(@PathVariable id: String, @RequestParam("parentID") parentID: Optional<String>): SImage {
-        return saImageService.cloneImageToDataset(id, parentID.orElse(""))
+    @GetMapping("/image/clone/{id}")
+    fun cloneImage(@PathVariable id: String, @RequestParam("parentID") parentID: Optional<String>): SImage {
+        return saImageService.cloneImage(id, parentID.orElse("")).first
     }
 
     @GetMapping("/image/rename/{id}")
@@ -70,7 +69,7 @@ class ImageController @Autowired constructor(
         if (multipartFile == null || multipartFile.size == 0L)
             throw IllegalArgumentException("File is empty")
 
-        return saImageService.addMultiPartImageToDataset(multipartFile, parentID)
+        return saImageService.addMultiPartImageToDataset(multipartFile, parentID).first
     }
 
 

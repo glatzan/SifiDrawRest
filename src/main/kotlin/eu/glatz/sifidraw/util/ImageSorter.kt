@@ -1,16 +1,16 @@
 package eu.glatz.sifidraw.util
 
-import eu.glatz.sifidraw.model.Image
+import eu.glatz.sifidraw.model.SAImage
 import java.math.BigInteger
 import java.util.regex.Pattern
 import kotlin.math.min
 
 
-object ImageSorter : Comparator<Image> {
+object ImageSorter : Comparator<SAImage> {
 
     private val NUMBERS: Pattern = Pattern.compile("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)")
 
-    override fun compare(p0: Image?, p1: Image?): Int {
+    override fun compare(p0: SAImage?, p1: SAImage?): Int {
         if (p0 == null || p1 == null) return if (p1 == null) if (p0 == null) 0 else -1 else 1
 
         // Splitting both input strings by the above patterns

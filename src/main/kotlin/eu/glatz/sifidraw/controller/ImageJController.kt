@@ -1,6 +1,6 @@
 package eu.glatz.sifidraw.controller
 
-import eu.glatz.sifidraw.model.Image
+import eu.glatz.sifidraw.model.SImage
 import eu.glatz.sifidraw.service.ImageJService
 import eu.glatz.sifidraw.service.ImageMagicService
 import eu.glatz.sifidraw.util.ImageUtil
@@ -17,7 +17,7 @@ class ImageJController @Autowired constructor(
         private val imageJService: ImageJService) {
 
     @PostMapping("/imagej/lines")
-    fun processImageReturnJSON(@RequestBody image: Image): String {
+    fun processImageReturnJSON(@RequestBody image: SImage): String {
 
         val file = ImageUtil.writeUniqueBase64Img(imageJService.dir, imageJService.file, image)
 

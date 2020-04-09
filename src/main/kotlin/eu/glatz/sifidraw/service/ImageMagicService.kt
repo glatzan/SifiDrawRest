@@ -1,6 +1,5 @@
 package eu.glatz.sifidraw.service
 
-import eu.glatz.sifidraw.model.Image
 import eu.glatz.sifidraw.util.ImageUtil
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Service

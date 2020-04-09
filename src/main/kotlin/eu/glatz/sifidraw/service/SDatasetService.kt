@@ -29,10 +29,4 @@ class SDatasetService @Autowired constructor(
         return sDatasetRepository.save(newDataset)
     }
 
-    fun addImageToDataset(datasetID: String, imageID: String): SAImage {
-        val dataset = sDatasetRepository.findById(datasetID).orElseThrow { IllegalArgumentException("Dataset not found") }
-        val image = saImageRepository.findById(imageID).orElseThrow { IllegalArgumentException("Image not found") }
-        return saImageService.moveImageToDataset(image, dataset)
-    }
-
 }

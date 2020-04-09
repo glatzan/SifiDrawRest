@@ -1,6 +1,7 @@
 package eu.glatz.sifidraw.util
 
-import eu.glatz.sifidraw.model.Image
+import eu.glatz.sifidraw.model.SAImage
+import eu.glatz.sifidraw.model.SImage
 import java.awt.image.BufferedImage
 import java.io.*
 import java.util.*
@@ -76,7 +77,7 @@ class ImageUtil {
         }
 
         @JvmStatic
-        fun writeUniqueBase64Img(dir: String, file: String, image: Image): File {
+        fun writeUniqueBase64Img(dir: String, file: String, image: SImage): File {
             val file = File(dir, file.replace("{}", System.currentTimeMillis().toString() + "" + Math.random()))
             println(file.absolutePath)
             ImageUtil.writeBase64Img(image.data, file);

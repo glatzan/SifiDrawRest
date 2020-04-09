@@ -1,7 +1,6 @@
 package eu.glatz.sifidraw.controller
 
 import com.fasterxml.jackson.annotation.JsonView
-import eu.glatz.sifidraw.model.SAImage
 import eu.glatz.sifidraw.model.SDataset
 import eu.glatz.sifidraw.repository.SDatasetRepository
 import eu.glatz.sifidraw.service.SDatasetService
@@ -30,17 +29,11 @@ class DatasetController @Autowired constructor(
         return sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found (ID: $id)") }
     }
 
-    @GetMapping("/dataset/new")
-    fun createDataset(@RequestParam("name") base64Name: Optional<String>, @RequestParam("projectID") projectID: Optional<String>): SDataset {
-        val datasetName = String(Base64.getDecoder().decode(base64Name.orElseThrow { IllegalArgumentException("Name must be provided") }.toByteArray()), Charset.forName("UTF-8"))
-        return sDatasetService.createDataset(datasetName, projectID.orElse(""))
-    }
-
-    /**
-     * addImageToDataset
-     */
-    @GetMapping("/dataset/addImage")
-    fun moveImageToDataset(@RequestParam("datasetID") datasetID: Optional<String>, @RequestParam("imageID") imageID: Optional<String>): SAImage {
-        return sDatasetService.addImageToDataset(datasetID.orElse(""), imageID.orElse(""))
+    @GetMapping("/dataset/create/{name}")
+    fun createDataset(@PathVariable name: String, @RequestParam("projectID") projectID: Optional<String>): SDataset {
+        val decodedName = String(Base64.getDecoder().decode(name), Charset.forName("UTF-8"))
+        if (name.isEmpty() || !projectID.isPresent)
+            throw IllegalArgumentException("Arguments not valid")
+        return sDatasetService.createDataset(decodedName, projectID.orElse(""))
     }
 }

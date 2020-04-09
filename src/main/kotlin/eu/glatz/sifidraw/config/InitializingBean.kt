@@ -1,15 +1,12 @@
 package eu.glatz.sifidraw.config
 
-import com.google.gson.Gson
-import eu.glatz.sifidraw.model.SDataset
-import eu.glatz.sifidraw.model.SImage
-import eu.glatz.sifidraw.model.SProject
 import eu.glatz.sifidraw.model.User
 import eu.glatz.sifidraw.repository.SAImageRepository
 import eu.glatz.sifidraw.repository.SDatasetRepository
 import eu.glatz.sifidraw.repository.SProjectRepository
 import eu.glatz.sifidraw.repository.UserRepository
 import eu.glatz.sifidraw.service.*
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -26,7 +23,6 @@ class InitializingBean @Autowired constructor(
         private val sProjectRepository: SProjectRepository,
         private val saImageService: SAImageService,
         private val sDatasetRepository: SDatasetRepository,
-        private val dbConverterService: DBConverterService,
         private val saImageRepository: SAImageRepository) : InitializingBean {
 
     @Throws(Exception::class)
@@ -46,6 +42,7 @@ class InitializingBean @Autowired constructor(
 //
 //        println(Gson().toJson(sProjectRepository.findAll()))
 
+        //println(sDatasetRepository.findByImageID(ObjectId("5e8b7668cbc29640ecd5edf4")))
     }
 
 }
