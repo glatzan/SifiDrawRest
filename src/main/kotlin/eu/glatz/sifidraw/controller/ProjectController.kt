@@ -1,6 +1,7 @@
 package eu.glatz.sifidraw.controller
 
 import com.fasterxml.jackson.annotation.JsonView
+import eu.glatz.sifidraw.legacy.DBConverterService
 import eu.glatz.sifidraw.model.SProject
 import eu.glatz.sifidraw.repository.SProjectRepository
 import eu.glatz.sifidraw.service.SProjectService
@@ -16,6 +17,7 @@ import java.util.*
 @RequestMapping("SifiDrawRest")
 class ProjectController @Autowired constructor(
         private val sProjectRepository: SProjectRepository,
+        private val dbConverterService: DBConverterService,
         private val sProjectService: SProjectService) {
 
     @JsonView(JsonViews.ProjectsAndDatasets::class)
@@ -30,7 +32,12 @@ class ProjectController @Autowired constructor(
     }
 
     @DeleteMapping("/projects/delete/{id}")
-    fun deleteProject(@PathVariable id: String) : Boolean {
+    fun deleteProject(@PathVariable id: String): Boolean {
         return sProjectService.deleteProject(id)
+    }
+
+    @GetMapping("/convertDB/version/{version}")
+    fun convertOLDDatabase(@PathVariable version: String) {
+        dbConverterService.sync()
     }
 }

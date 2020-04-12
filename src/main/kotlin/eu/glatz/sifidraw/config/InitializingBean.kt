@@ -37,12 +37,6 @@ class InitializingBean @Autowired constructor(
             newUser.localUser = true
             userService.createNewUser(newUser)
         }
-//
-//         dbConverterService.sync()
-//
-//        println(Gson().toJson(sProjectRepository.findAll()))
-
-        //println(sDatasetRepository.findByImageID(ObjectId("5e8b7668cbc29640ecd5edf4")))
     }
 
 }
