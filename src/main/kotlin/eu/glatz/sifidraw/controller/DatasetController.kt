@@ -37,6 +37,11 @@ class DatasetController @Autowired constructor(
         val decodedName = String(Base64.getDecoder().decode(name), Charset.forName("UTF-8"))
         if (name.isEmpty() || !projectID.isPresent)
             throw IllegalArgumentException("Arguments not valid")
-        return sDatasetService.createDataset(decodedName, projectID.orElse(""))
+        return sDatasetService.createDataset(decodedName, projectID.orElse("")).first
+    }
+
+    @DeleteMapping("/dataset/delete/{id}")
+    fun deleteDataset(@PathVariable id: String): Boolean {
+        return sDatasetService.deleteDataset(id)
     }
 }

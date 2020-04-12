@@ -11,7 +11,8 @@ import java.io.File
 class SProjectService @Autowired constructor(
         private val sequenceGeneratorService: SequenceGeneratorService,
         private val projectSettings: ProjectSettings,
-        private val projectRepository: SProjectRepository) : AbstractFileService() {
+        private val sDatasetService: SDatasetService,
+        private val sProjectRepository: SProjectRepository) : AbstractFileService() {
 
     fun createProject(name: String): SProject {
         val newProject = SProject()
@@ -24,7 +25,20 @@ class SProjectService @Autowired constructor(
         projectFile.mkdirs()
         newProject.path = "${projectFile.name}/"
 
-        return projectRepository.save(newProject)
+        return sProjectRepository.save(newProject)
+    }
+
+    fun deleteProject(projectID :String) : Boolean{
+        val project = sProjectRepository.findById(projectID).orElseThrow { throw IllegalArgumentException("Project not found!") }
+
+        for(dataset in project.datasets){
+            sDatasetService.deleteDataset(dataset.id ?: "",true)
+        }
+
+        sProjectRepository.delete(project)
+        File(projectSettings.dir, project.path).delete()
+
+        return true
     }
 
 }

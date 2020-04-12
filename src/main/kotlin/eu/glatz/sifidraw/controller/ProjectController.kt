@@ -28,4 +28,9 @@ class ProjectController @Autowired constructor(
     fun createProject(@PathVariable name: String): SProject {
         return sProjectService.createProject(String(Base64.getDecoder().decode(name), Charset.forName("UTF-8")))
     }
+
+    @DeleteMapping("/projects/delete/{id}")
+    fun deleteProject(@PathVariable id: String) : Boolean {
+        return sProjectService.deleteProject(id)
+    }
 }

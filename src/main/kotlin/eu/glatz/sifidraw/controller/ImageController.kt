@@ -28,8 +28,6 @@ class ImageController @Autowired constructor(
         return saImageService.updateImage(image)
     }
 
-    //     @PostMapping("/imagegroup/addImage")
-    //     @PostMapping("/image/{type}")
     @PostMapping("/image/addToParent/{parentID}")
     fun addImageToParent(@RequestBody image: SImage, @PathVariable parentID: String, @RequestParam("format") format: Optional<String>) {
         if (format.isPresent && !format.get().matches(Regex("jpg|png|tif|bmp")))
@@ -70,6 +68,13 @@ class ImageController @Autowired constructor(
         return saImageService.addMultiPartImageToDataset(multipartFile, parentID).first
     }
 
+    @PostMapping("/image/create")
+    fun createImage(@RequestBody image: SImage, @RequestParam("format") format: Optional<String>): Boolean {
+        if (format.isPresent && !format.get().matches(Regex("jpg|png|tif|bmp")))
+            throw IllegalArgumentException("Please provide a valid type")
+        saImageService.createImageByPath(image, format.get())
+        return true
+    }
 
 //    @PutMapping("/image/update/checked")
 //    fun updateAndCheckImageData(@RequestBody image: Image): Image {

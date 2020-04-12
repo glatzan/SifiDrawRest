@@ -73,21 +73,24 @@ class SImageGroupService @Autowired constructor(
         return Pair(dbImageGroup, dbParent)
     }
 
-    fun deleteImageGroup(imageGroupID: String) {
+    fun deleteImageGroup(imageGroupID: String, removeFromParent: Boolean = true) {
         val imageGroup = saImageRepository.findById(imageGroupID).orElseThrow { throw IllegalArgumentException("ImageGroup not found!") }
         if (imageGroup !is SImageGroup)
             throw IllegalArgumentException("No ImageGroup found!")
 
-        deleteImageGroup(imageGroup)
+        deleteImageGroup(imageGroup,removeFromParent)
     }
 
-    fun deleteImageGroup(imageGroup: SImageGroup) {
+    fun deleteImageGroup(imageGroup: SImageGroup, removeFromParent: Boolean = true) {
         for (img in imageGroup.images) {
             if (img is SImage)
                 saImageService.deleteImage(img, false)
             else if (img is SImageGroup)
                 deleteImageGroup(img)
         }
+
+        if(removeFromParent)
+            saImageService.removeImageFromParent(imageGroup)
 
         FileUtils.deleteDirectory(File(projectSettings.dir, imageGroup.path))
         saImageRepository.delete(imageGroup)

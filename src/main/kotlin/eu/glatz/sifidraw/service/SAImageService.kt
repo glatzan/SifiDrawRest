@@ -4,9 +4,11 @@ import eu.glatz.sifidraw.config.ProjectSettings
 import eu.glatz.sifidraw.model.*
 import eu.glatz.sifidraw.repository.SAImageRepository
 import eu.glatz.sifidraw.repository.SDatasetRepository
+import eu.glatz.sifidraw.repository.SProjectRepository
 import eu.glatz.sifidraw.util.ImageUtil
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -14,11 +16,11 @@ import java.util.*
 
 @Service
 class SAImageService @Autowired constructor(
-        private val sequenceGeneratorService: SequenceGeneratorService,
         private val projectSettings: ProjectSettings,
         private val sDatasetRepository: SDatasetRepository,
+        @Lazy private val sDatasetService: SDatasetService,
         private val saImageRepository: SAImageRepository,
-        private val imageRepository: SAImageRepository) : AbstractFileService() {
+        private val sProjectRepository: SProjectRepository) : AbstractFileService() {
 
     fun loadImage(imageID: String, loadImageData: Boolean = true, asFormat: String = "png"): SImage {
         val image = saImageRepository.findById(imageID).orElseThrow { throw IllegalArgumentException("Image not found!") }
@@ -132,10 +134,37 @@ class SAImageService @Autowired constructor(
         return addImageToParentLoaded(image, dataset)
     }
 
+    fun createImageByPath(image: SImage, format: String = "png"): SImage {
+        val path = image.path.replace("\\", "/")
+        val pathArray = path.split("/")
+
+        if (pathArray.size != 3) {
+            throw IllegalArgumentException("Image Path not well formatted!")
+        }
+
+        val project = sProjectRepository.findByName(pathArray[0]).orElseThrow { throw IllegalArgumentException("Project not found ny path: ${pathArray[0]}") }
+        println(pathArray[1])
+        println("/^${project.path.replace("/", "\\/")}.*/")
+        val dataset = sDatasetRepository.findByNameAndPathRegex(pathArray[1], "${project.path.replace("/", "")}.*").orElse(sDatasetService.createDataset(pathArray[1], project.id
+                ?: "").first)
+
+        return addImageToParentLoaded(image, dataset, format).first
+    }
+
+    fun createImage(image: SImage, parentID: String): Pair<SImage, SIHasImages> {
+        val parent = findParent(parentID)
+
+        val imageResult = saImageRepository.save(image)
+        parent.images.add(image)
+        val parentResult = saveParent(parent)
+
+        return Pair(imageResult, parentResult)
+    }
+
     /**
      * Removes Image or ImageGroup form Parent (Dataset or Imagegroup)
      */
-    private fun removeImageFromParent(image: SAImage): SIHasImages? {
+    fun removeImageFromParent(image: SAImage): SIHasImages? {
         // removing from old dataset
         val parent = findParentByImage(image)
         val dBImage = parent.images.findLast { it.id == image.id }
@@ -187,17 +216,4 @@ class SAImageService @Autowired constructor(
             else -> throw IllegalArgumentException("Parent not recognized")
         }
     }
-
-
-    fun createImage(name: String, path: String): SImage {
-        val baseDir = File(projectSettings.dir)
-
-        val image = SImage()
-        image.name = name
-        image.path = path
-
-        return imageRepository.save(image)
-    }
-
-
 }
