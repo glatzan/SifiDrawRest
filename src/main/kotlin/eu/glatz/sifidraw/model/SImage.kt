@@ -29,6 +29,6 @@ class SImage : SAImage() {
     var hasLayerData = false
 
     init {
-        type = "img"
+        type = "image"
     }
 }

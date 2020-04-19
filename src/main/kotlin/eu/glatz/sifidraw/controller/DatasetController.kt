@@ -44,4 +44,11 @@ class DatasetController @Autowired constructor(
     fun deleteDataset(@PathVariable id: String): Boolean {
         return sDatasetService.deleteDataset(id)
     }
+
+    @GetMapping("/dataset/rename/{id}")
+    fun renameDataset(@PathVariable id: String, @RequestParam("newName") newName: Optional<String>): SDataset {
+        val result = sDatasetRepository.findById(id).orElseThrow { IllegalArgumentException("Dataset not found!") }
+        result.name = String(Base64.getDecoder().decode(newName.orElseThrow { IllegalArgumentException("Provide Name!") }), Charset.forName("UTF-8"))
+        return sDatasetRepository.save(result)
+    }
 }

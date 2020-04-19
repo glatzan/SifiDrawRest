@@ -36,8 +36,22 @@ class ProjectController @Autowired constructor(
         return sProjectService.deleteProject(id)
     }
 
+    @GetMapping("/projects/rename/{id}")
+    fun renameDataset(@PathVariable id: String, @RequestParam("newName") newName: Optional<String>): SProject {
+        val result = sProjectRepository.findById(id).orElseThrow { IllegalArgumentException("Project not found!") }
+        result.name = String(Base64.getDecoder().decode(newName.orElseThrow { IllegalArgumentException("Provide Name!") }), Charset.forName("UTF-8"))
+        return sProjectRepository.save(result)
+    }
+
+    @GetMapping("/projects/export/{projectID}")
+    fun exportProject(@PathVariable projectID: String){
+        sProjectService.exportProject(projectID);
+    }
+
     @GetMapping("/convertDB/version/{version}")
     fun convertOLDDatabase(@PathVariable version: String) {
         dbConverterService.sync()
     }
+
+
 }

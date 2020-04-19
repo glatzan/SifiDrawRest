@@ -17,4 +17,9 @@ class SDataset : SEntity(), SIHasImages {
     @JsonView(JsonViews.AllDatasetData::class, JsonViews.OnlyDatasetData::class)
     @DBRef(lazy = true)
     override var images = mutableListOf<SAImage>()
+
+
+    init {
+        type = "dataset"
+    }
 }

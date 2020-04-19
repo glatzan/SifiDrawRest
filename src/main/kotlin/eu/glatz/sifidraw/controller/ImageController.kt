@@ -53,7 +53,7 @@ class ImageController @Autowired constructor(
     @GetMapping("/image/rename/{id}")
     fun renameImage(@PathVariable id: String, @RequestParam("newName") newName: Optional<String>): SAImage {
         val result = saImageRepository.findById(id).orElseThrow { IllegalArgumentException("Image not found!") }
-        result.name = String(Base64.getDecoder().decode(newName.orElseThrow { IllegalArgumentException("Entity not found!") }), Charset.forName("UTF-8"))
+        result.name = String(Base64.getDecoder().decode(newName.orElseThrow { IllegalArgumentException("Provide Name!") }), Charset.forName("UTF-8"))
         return saImageRepository.save(result)
     }
 
@@ -75,17 +75,4 @@ class ImageController @Autowired constructor(
         saImageService.createImageByPath(image, format.get())
         return true
     }
-
-//    @PutMapping("/image/update/checked")
-//    fun updateAndCheckImageData(@RequestBody image: Image): Image {
-//        return if (imageService.imageExist(image.id)) {
-//            println("image ok update" + image.name)
-//            return imageService.updateImage(image)
-//        } else {
-//            val img = Gson().toJson(image)
-//            println("Image not found!")
-//            println(img)
-//            Image("-", "-")
-//        }
-//    }
 }

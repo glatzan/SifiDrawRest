@@ -57,6 +57,16 @@ class SAImageService @Autowired constructor(
     }
 
     fun addImageToParentLoaded(image: SImage, parent: SIHasImages, format: String = "png"): Pair<SImage, SIHasImages> {
+        if(image.path.isEmpty())
+            image.path = image.name
+
+        if(!image.path.endsWith(format)){
+            if(image.path.matches(Regex(".*\\.[A-Za-z]{2,4}$"))){
+                image.path = image.path.substringBeforeLast(".") + format
+            }else
+                image.path += ".$format"
+        }
+
         val imageNameWithExtension = if (image.path.contains("/")) image.path.substringAfterLast("/") else image.path
         val imagePath = getUniqueFile(File(projectSettings.dir, parent.path), imageNameWithExtension)
         ImageUtil.writeBase64Img(image.data, imagePath, format)

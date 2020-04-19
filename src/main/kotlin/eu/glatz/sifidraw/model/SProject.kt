@@ -17,4 +17,8 @@ class SProject : SEntity() {
     @JsonView(JsonViews.ProjectsAndDatasets::class, JsonViews.AllDatasetData::class)
     @DBRef
     var datasets = mutableListOf<SDataset>()
+
+    init {
+        type = "project"
+    }
 }
